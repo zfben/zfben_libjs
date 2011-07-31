@@ -1,6 +1,5 @@
 #!/usr/bin/env ruby
-require 'rubygems'
-require 'zfben_libjs'
+require File.join(File.dirname(__FILE__), '..', 'lib', 'zfben_libjs.rb')
 
 p args = ARGF.argv
 
