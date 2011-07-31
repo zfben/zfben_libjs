@@ -1,4 +1,9 @@
-source "http://rubygems.org"
-
-# Specify your gem's dependencies in zfben_libjs.gemspec
-gemspec
+source 'http://rubygems.org'
+gem 'json'
+gem 'therubyracer'
+gem 'coffee-script'
+gem 'uglifier'
+gem 'compass'
+gem 'sinatra'
+gem 'watchr'
+gem 'rainbow'

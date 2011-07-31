@@ -1,3 +1,20 @@
 #!/usr/bin/env ruby
+require 'rubygems'
+require 'zfben_libjs'
 
-p 'ok'
+p args = ARGF.argv
+
+if args.length == 0
+  STDERR.print "Please use `libjs [config_filename]` or use `libjs new` to create new libjs project\n".color(:green)
+else
+  if args[0] == 'new'
+    cmd = 'cp ' + File.join(File.dirname(__FILE__), '..', 'lib', 'zfben_libjs', 'example.yml') + ' ' + File.realpath('.')
+    if system(cmd)
+      STDOUT.print "#{cmd}\n".color(:green)
+    else
+      exit!
+    end
+  else
+    Libjs.new(args[0])
+  end
+end
