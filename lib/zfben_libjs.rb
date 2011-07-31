@@ -1,10 +1,13 @@
-require 'zfben_libjs/version'
-require 'zfben_libjs/lib'
-require 'bundler/setup'
-Bundler.require
+require 'rubygems'
+require 'rainbow'
+require 'json'
+require 'compass'
+require 'coffee-script'
+require 'uglifier'
 require 'yaml'
 require 'sass/css'
-
+require File.join(File.dirname(__FILE__), 'zfben_libjs', 'lib.rb')
+  
 def err msg
   STDERR.print "#{msg}\n".color(:red)
   exit!
@@ -220,10 +223,12 @@ class Libjs
     
     libjs = File.read(@libs['lazyload']) << ';'
     
+    lib_coffee = CoffeeScript.compile(File.join(File.dirname(__FILE__), 'zfben_libjs', File.read('lib.coffee')))
+    
     if @config['minify']
-      libjs << minify(CoffeeScript.compile(File.read('lib.coffee')), :js)
+      libjs << minify(lib_coffee, :js)
     else
-      libjs << CoffeeScript.compile(File.read('lib.coffee'))
+      libjs << lib_coffee
     end
     
     @libs.each do |lib, path|

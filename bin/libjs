@@ -1,16 +1,20 @@
 #!/usr/bin/env ruby
 require File.join(File.dirname(__FILE__), '..', 'lib', 'zfben_libjs.rb')
 
-p args = ARGF.argv
+args = ARGF.argv
 
 if args.length == 0
-  STDERR.print "Please use `libjs [config_filename]` or use `libjs new` to create new libjs project\n".color(:green)
+  tip 'Please use `libjs [config_filename]` or use `libjs new` to create new libjs project'
 else
   if args[0] == 'new'
-    system('mkdir libjs')
-    cmd = 'cp ' + File.join(File.dirname(__FILE__), '..', 'lib', 'zfben_libjs', 'example.yml') + ' ' + File.realpath('libjs')
+    folder = args.length > 1 ? args[1] : 'libjs'
+    if File.exists?(folder)
+      err folder + ' folder is exists!'
+    end
+    system('mkdir ' + folder)
+    cmd = 'cp ' + File.join(File.dirname(__FILE__), '..', 'lib', 'zfben_libjs', 'libjs.yml') + ' ' + folder
     if system(cmd)
-      STDOUT.print "Create libjs/example.yml\nYou change it then use `libjs example` to build it\n".color(:green)
+      tip "Create #{folder}/libjs.yml\nYou can change it then use `libjs #{folder}/libjs` to build it"
     end
   else
     lib = Libjs.new(args[0])
