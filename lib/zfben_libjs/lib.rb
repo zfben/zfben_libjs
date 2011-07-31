@@ -1,3 +1,13 @@
+class String
+  def partition_all(reg)
+    r = self.partition(reg)
+    if reg =~ r[2]
+      r[2] = r[2].partition_all(reg)
+    end
+    return r.flatten
+  end
+end
+
 def get_filetype path
   return File.extname(path).delete('.')
 end
@@ -17,10 +27,11 @@ end
 def css_import url, dir
   path = File.join(dir, File.basename(url))
   download url, path
-  reg = /@import[^"]+"([^"]+)"[^"]*/
+  reg = /@import\s+\(?"([^"]+)"\)?;?/
   return File.read(path).partition_all(reg).map{ |f|
     if reg =~ f
-      f = "/* #{f.gsub(/\n/, '')} */\n#{css_import(File.join(File.dirname(url), reg.match(f)[1]), dir)}"
+      f = reg.match(f)[1]
+      f = "/* @import #{f} */\n" + css_import(File.join(File.dirname(url), f), dir)
     end
     f
   }.join("\n")

@@ -21,7 +21,7 @@ class Libjs
   def initialize config_file
     @config_file = File.exists?(config_file) ? [config_file] : Dir[config_file + '*']
     if @config_file.length == 0 || File.directory?(@config_file[0])
-      err config_file << ' is not exist!'
+      err config_file + ' is not exist!'
     else
       @config_file = @config_file[0]
     end
@@ -38,13 +38,17 @@ class Libjs
   end
   
   def build!
-    @config = {
-      'src' => 'src/example',
-      'download' => false,
-      'minify' => true
-    }.merge(@data['config'])
+    print '== Starting Build @' + @config_file
 
-    @config['url'] = @config['src'] unless @config.has_key?('url')
+    # Merge default config
+    @config = {
+      'src' => 'src',
+      'download' => false,
+      'minify' => true,
+      'url' => ''
+    }.merge(@data['config'])
+    
+    @config['src'] = File.join(File.dirname(@config_file), @config['src'])
     system('mkdir ' + @config['src']) unless File.exists?(@config['src'])
     
     ['source'].each do |path|
@@ -53,6 +57,7 @@ class Libjs
     end
     
     ['javascripts', 'stylesheets', 'images'].each do |path|
+      @config['url/' + path] = @config['url'] + '/' + path unless @config.has_key?('url/' + path)
       @config['src/' + path] = File.join(@config['src'], path) unless @config.has_key?('src/' + path)
       system('mkdir ' + @config['src/' + path]) unless File.exists?(@config['src/' + path])
     end
@@ -187,10 +192,10 @@ class Libjs
           if type == 'stylesheets' && @config['changeImageUrl'] && reg =~ File.read(path)
             css = File.read(path).partition_all(reg).map{ |f|
               if reg =~ f
-                if @config['url'] == @config['src']
+                if @config['url'] == ''
                   f = 'url("../images/' << File.basename(f.match(reg)[1]) << '")'
                 else
-                  f = 'url("' + @config['url'] + '/images/' << File.basename(f.match(reg)[1]) << '")'
+                  f = 'url("' + @config['url/images'] + File.basename(f.match(reg)[1]) << '")'
                 end
               end
               f
@@ -215,7 +220,7 @@ class Libjs
           path = @libs[file]
         end
         path
-      }.compact.flatten
+      }.compact.flatten.uniq
       @libs[name] = @libs[name][0] if @libs[name].length == 1
     end
     
@@ -223,28 +228,28 @@ class Libjs
     
     libjs = File.read(@libs['lazyload']) << ';'
     
-    lib_coffee = CoffeeScript.compile(File.join(File.dirname(__FILE__), 'zfben_libjs', File.read('lib.coffee')))
+    libjs_core = CoffeeScript.compile(File.read(File.join(File.dirname(__FILE__), 'zfben_libjs', 'lib.coffee')))
+
+    libjs << (@config['minify'] ? minify(libjs_core, :js) : @config['minify'])
     
-    if @config['minify']
-      libjs << minify(lib_coffee, :js)
-    else
-      libjs << lib_coffee
-    end
-    
+    @urls = {}
     @libs.each do |lib, path|
       path = [path] unless path.class == Array
       path = path.map{ |url|
-        url = url.gsub(@config['src'], @config['url'])
         case File.extname(url)
-          when '.css', '.js'
+          when '.css'
+            url = @config['url/stylesheets'] + '/' + File.basename(url)
+          when '.js'
+            url = @config['url/javascripts'] + '/' + File.basename(url)
           else
             url = nil
         end
         url
-      }.compact
+      }.compact.uniq
+      @urls[lib] = path
     end
     
-    libjs << "\n/* libs */\nlib.libs(#{@libs.to_json});"
+    libjs << "\n/* libs */\nlib.libs(#{@urls.to_json});"
     
     if @bundle != nil && @bundle.length > 0
       @bundle.each do |name, libs|
@@ -252,9 +257,9 @@ class Libjs
         js = ''
         files = []
         libs.each do |lib|
-          source = @libs[lib]
-          source = [source] if source.class != Array
-          source.each do |file|
+          lib = @libs[lib] if @libs.has_key?(lib)
+          lib = [lib] unless lib.class == Array
+          lib.each do |file|
             files.push(file)
             case File.extname(file)
               when '.css'
@@ -270,15 +275,15 @@ class Libjs
         if css != ''
           file = File.join(@config['src/stylesheets'], name + '.css')
           File.open(file, 'w'){ |f| f.write(css) }
-          path.push(file)
+          path.push(@config['url/stylesheets'] + '/' + File.basename(file))
         end
         
         if js != ''
-          files = files.join("','")
-          js << "\nif(typeof lib === 'function'){lib.loaded('add', '#{files}');}"
+          files_url = files.map{ |f| @config['url/javascripts'] + '/' + File.basename(f) }.join("','")
+          js << "\nif(typeof lib === 'function'){lib.loaded('add', '#{files_url}');}"
           file = File.join(@config['src/javascripts'], name + '.js')
           File.open(file, 'w'){ |f| f.write(js) }
-          path.push(file)
+          path.push(@config['url/javascripts'] + '/' + File.basename(file))
         end
         
         if path.length > 0

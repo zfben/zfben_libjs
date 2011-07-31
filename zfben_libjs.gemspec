@@ -10,6 +10,15 @@ Gem::Specification.new do |s|
   s.homepage    = ""
   s.summary     = %q{}
   s.description = %q{}
+  
+  s.post_install_message =%q{
+********************************************************************************
+  Thank you for using zfben_libjs!
+  
+  Please follow @zfben on Twitter for announcements, updates, and news.
+  https://twitter.com/zfben
+********************************************************************************
+}
 
   s.rubyforge_project = "zfben_libjs"
 
