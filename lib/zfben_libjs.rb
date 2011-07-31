@@ -1,4 +1,5 @@
 require 'zfben_libjs/version'
+require 'zfben_libjs/lib'
 require 'bundler/setup'
 Bundler.require
 require 'yaml'
@@ -33,7 +34,7 @@ class Libjs
     p @data
   end
   
-  def build
+  def build!
     @config = {
       'src' => 'src/example',
       'download' => false,

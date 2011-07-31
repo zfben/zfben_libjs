@@ -11,9 +11,12 @@ else
     system('mkdir libjs')
     cmd = 'cp ' + File.join(File.dirname(__FILE__), '..', 'lib', 'zfben_libjs', 'example.yml') + ' ' + File.realpath('libjs')
     if system(cmd)
-      STDOUT.print "Create example.yml\nYou change it then use `libjs example` to build it\n".color(:green)
+      STDOUT.print "Create libjs/example.yml\nYou change it then use `libjs example` to build it\n".color(:green)
     end
   else
     lib = Libjs.new(args[0])
+    if args.length == 1
+      lib.build!
+    end
   end
 end
