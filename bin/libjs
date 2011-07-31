@@ -8,13 +8,12 @@ if args.length == 0
   STDERR.print "Please use `libjs [config_filename]` or use `libjs new` to create new libjs project\n".color(:green)
 else
   if args[0] == 'new'
-    cmd = 'cp ' + File.join(File.dirname(__FILE__), '..', 'lib', 'zfben_libjs', 'example.yml') + ' ' + File.realpath('.')
+    system('mkdir libjs')
+    cmd = 'cp ' + File.join(File.dirname(__FILE__), '..', 'lib', 'zfben_libjs', 'example.yml') + ' ' + File.realpath('libjs')
     if system(cmd)
-      STDOUT.print "#{cmd}\n".color(:green)
-    else
-      exit!
+      STDOUT.print "Create example.yml\nYou change it then use `libjs example` to build it\n".color(:green)
     end
   else
-    Libjs.new(args[0])
+    lib = Libjs.new(args[0])
   end
 end
