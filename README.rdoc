@@ -1,0 +1,47 @@
+== SUMMARY
+
+Lib.js = Frontend build tool + lazyload js tool
+
+See qunit example at http://benz303.github.com/lib.js
+
+Lib.js support:
+
+lazyload css and js files (base on LazyLoad.js)
+css, js and images files
+sass, scss, compass and coffeescript files
+local files and remote files
+custom ruby script
+minify css and js files (base on sass and uglifier)
+
+== Example
+
+  // load jquery
+  lib.jquery(function(){
+    // something use jquery to do
+  });
+  
+  // load jqueryui and not duplicate load jquery
+  lib.jqueryui(function(){
+    // something use jqueryui to do
+  });
+  
+  // and you can load like
+  lib('jquery', function(){
+    // use jquery to do sth.
+  });
+  
+  lib('jquery underscore', function(){
+    // use jquery and underscore to do sth.
+  });
+  
+More Options see https://github.com/benz303/lib.js/blob/gh-pages/example.yml
+
+== Getting Started
+
+ 1. Install zfben_libjs
+
+  gem install zfben_libjs
+
+ 2. Create new libjs project
+
+  libjs new

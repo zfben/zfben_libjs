@@ -32,9 +32,10 @@ class Libjs
       err "#{@config_file} load filed!\n#{e}"
     end
     
-    tip "#{@config_file} load success!"
+    @path_gem = File.realpath(File.join(File.dirname(__FILE__), 'zfben_libjs'))
+    @path_lib = File.realpath('.')
     
-    p @data
+    tip "#{@config_file} load success!"
   end
   
   def build!
@@ -228,9 +229,13 @@ class Libjs
     
     libjs = File.read(@libs['lazyload']) << ';'
     
-    libjs_core = CoffeeScript.compile(File.read(File.join(File.dirname(__FILE__), 'zfben_libjs', 'lib.coffee')))
+    libjs_core = CoffeeScript.compile(File.read(File.join(@path_gem, 'lib.coffee')))
 
-    libjs << (@config['minify'] ? minify(libjs_core, :js) : @config['minify'])
+    if @config['minify']
+      libjs << minify(libjs_core, :js)
+    else
+      libjs << libjs_core
+    end
     
     @urls = {}
     @libs.each do |lib, path|
