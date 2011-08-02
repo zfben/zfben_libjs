@@ -1,3 +1,5 @@
+= Lib.js
+
 == SUMMARY
 
 Lib.js = Frontend build tool + lazyload js tool
