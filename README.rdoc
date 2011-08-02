@@ -2,7 +2,7 @@
 
 Lib.js = Frontend build tool + lazyload js tool
 
-Feature:
+=== Feature:
 
 lazyload css and js files (base on LazyLoad.js)
 
@@ -18,7 +18,7 @@ support minify css and js files (base on sass and uglifier)
 
 support before and after events
 
-Support Filetype:
+=== Support Filetype:
 
 .css    -   stylesheet
 
