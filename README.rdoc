@@ -5,19 +5,31 @@ Lib.js = Frontend build tool + lazyload js tool
 Feature:
 
 lazyload css and js files (base on LazyLoad.js)
-css, js and images files
-sass, scss, compass and coffeescript files
-local files and remote files
-custom ruby script
-minify css and js files (base on sass and uglifier)
+
+support css, js and images files
+
+support sass, scss, compass and coffeescript files
+
+support local files and remote files
+
+support custom ruby script
+
+support minify css and js files (base on sass and uglifier)
+
+support before and after events
 
 Support Filetype:
 
 .css    -   stylesheet
+
 .js     -   javascript
+
 .sass   -   sass
+
 .scss   -   scss
+
 .coffee -   coffeescript
+
 .rb     -   ruby
 
 == Example
