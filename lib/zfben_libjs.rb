@@ -39,7 +39,7 @@ class Libjs
   end
   
   def build!
-    print '== Starting Build @' + @config_file
+    tip '== Starting Build @' + @config_file
 
     # Merge default config
     @config = {
@@ -77,12 +77,12 @@ class Libjs
     end
     
     
-    p '== [1/2] Starting Progress Source =='
+    tip '== [1/2] Starting Progress Source =='
     length = @libs.length
     num = 0
     @libs.each do |name, urls|
       num = num + 1
-      p "[#{num}/#{length}] #{name}"
+      tip "[#{num}/#{length}] #{name}"
       urls = [urls] unless urls.class == Array
       lib = []
       urls.each do |url|
@@ -225,17 +225,13 @@ class Libjs
       @libs[name] = @libs[name][0] if @libs[name].length == 1
     end
     
-    p '== [2/2] Generate lib.js =='
+    tip '== [2/2] Generate lib.js =='
     
     libjs = File.read(@libs['lazyload']) << ';'
     
-    libjs_core = CoffeeScript.compile(File.read(File.join(@path_gem, 'lib.coffee')))
+    libjs_core = File.read(File.join(@path_gem, 'lib.coffee'))
 
-    if @config['minify']
-      libjs << minify(libjs_core, :js)
-    else
-      libjs << libjs_core
-    end
+    libjs << CoffeeScript.compile(libjs_core)
     
     @urls = {}
     @libs.each do |lib, path|
@@ -305,12 +301,14 @@ class Libjs
     if @preload.class == Array && @preload.length > 0
       libjs << "\n/* preload */\nlib('#{@preload.join(' ')}');"
     end
+    
+    libjs = minify(libjs, :js) if @config['minify']
     File.open(File.join(@config['src/javascripts'], 'lib.js'), 'w'){ |f| f.write(libjs) }
     
     if @config.has_key?('after')
       load @config['after']
     end
     
-    p '== End Build =='
+    tip '== End Build =='
   end
 end

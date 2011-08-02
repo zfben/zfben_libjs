@@ -11,8 +11,7 @@ Gem::Specification.new do |s|
   s.summary     = %q{}
   s.description = %q{}
   
-  s.post_install_message =%q{
-********************************************************************************
+  s.post_install_message =%q{********************************************************************************
   Thank you for using zfben_libjs!
   
   Please follow @zfben on Twitter for announcements, updates, and news.
@@ -32,7 +31,6 @@ Gem::Specification.new do |s|
   s.add_dependency 'rainbow'
   s.add_dependency 'json'
   s.add_dependency 'compass'
-  s.add_dependency 'mustang'
   s.add_dependency 'coffee-script'
   s.add_dependency 'uglifier'
   
