@@ -230,8 +230,10 @@ class Libjs
     libjs = File.read(@libs['lazyload']) << ';'
     
     libjs_core = File.read(File.join(@path_gem, 'lib.coffee'))
+    
+    libjs_core = CoffeeScript.compile(libjs_core)
 
-    libjs << CoffeeScript.compile(libjs_core)
+    libjs << libjs_core << ';'
     
     @urls = {}
     @libs.each do |lib, path|

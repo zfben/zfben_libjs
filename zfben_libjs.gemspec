@@ -7,7 +7,7 @@ Gem::Specification.new do |s|
   s.version     = ZfbenLibjs::VERSION
   s.authors     = ["Ben"]
   s.email       = ["ben@zfben.com"]
-  s.homepage    = ""
+  s.homepage    = "https://github.com/benz303/zfben_libjs"
   s.summary     = %q{}
   s.description = %q{}
   

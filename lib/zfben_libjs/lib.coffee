@@ -1,8 +1,26 @@
+# save libs to `libs`
+libs = {}
+
 # save loaded source to `loaded`
 loaded = {}
 
-# save libs to `libs`
-libs = {}
+# save pending funcs in `pending_funcs`
+pending_funcs = {}
+
+# function for run funcs
+run_funcs = ->
+  loaded_string = ' ' + loaded.join(' ') + ' '
+  for urls, funcs of pending_funcs
+    url_list = urls.split(' ')
+    urls_loaded = true
+    for url in url_list
+      if loaded_string.indexOf(' ' + url + ' ') < 0
+        urls_loaded = false
+        break
+    if urls_loaded
+      for func in funcs
+        func()
+      delete(pending_funcs[urls])
 
 # lib start here
 lib = ->
@@ -33,33 +51,19 @@ lib = ->
   
   # progress css
   if css.length > 0
-    if js.length is 0 && funcs.length > 0
-      LazyLoad.css(css, ->
-        for url in css
-          loaded[url] = true
-        for func in funcs
-          func()
-      )
-    else
-      LazyLoad.css(css, ->
-        for url in css
-          loaded[url] = true
-      )
+    LazyLoad.css(css, ->
+      for url in css
+        loaded[url] = true
+      run_funcs()
+    )
   
   # progress js
   if js.length > 0
-    if funcs.length > 0
-      LazyLoad.js(js, ->
-        for url in js
-          loaded[url] = true
-        for func in funcs
-          func()
-      )
-    else
-      LazyLoad.js(js, ->
-        for url in js
-          loaded[url] = true
-      )
+    LazyLoad.js(js, ->
+      for url in js
+        loaded[url] = true
+      run_funcs()
+    )
   
   # if everything is loaded, run funcs
   if css.length is 0 && js.length is 0 && funcs.length > 0
