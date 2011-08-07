@@ -4,12 +4,16 @@ libs = {}
 # save loaded source to `loaded`
 loaded = {}
 
-# save pending funcs in `pending_funcs`
+# pending
+pending_urls = {}
 pending_funcs = {}
 
 # function for run funcs
 run_funcs = ->
-  loaded_string = ' ' + loaded.join(' ') + ' '
+  loaded_string = [' ']
+  for url of loaded
+    loaded_string.push(url)
+  loaded_string = loaded_string.join(' ') + ' '
   for urls, funcs of pending_funcs
     url_list = urls.split(' ')
     urls_loaded = true
@@ -21,6 +25,7 @@ run_funcs = ->
       for func in funcs
         func()
       delete(pending_funcs[urls])
+  return true
 
 # lib start here
 lib = ->
@@ -29,18 +34,25 @@ lib = ->
   css = []
   js = []
   funcs = []
+  urls = []
   
   source_types = (args)->
     for arg in args
       switch typeof arg
         when 'string'
-          if typeof loaded[arg] is 'undefined'
+          if typeof loaded[arg] is 'undefined' && typeof pending_urls[arg] is 'undefined'
             if arg.indexOf(' ') >= 0
               source_types(arg.split(' '))
             else
               if typeof libs[arg] isnt 'undefined' then source_types(libs[arg])
-              if /\.css[^\.]*$/.test(arg) then css.push(arg)
-              if /\.js[^\.]*$/.test(arg) then js.push(arg)
+              if /\.css[^\.]*$/.test(arg)
+                css.push(arg)
+                urls.push(arg)
+                pending_urls[arg] = true
+              if /\.js[^\.]*$/.test(arg)
+                js.push(arg)
+                urls.push(arg)
+                pending_urls[arg] = true
         when 'function'
           funcs.push(arg)
         else
@@ -54,6 +66,7 @@ lib = ->
     LazyLoad.css(css, ->
       for url in css
         loaded[url] = true
+        delete pending_urls[url]
       run_funcs()
     )
   
@@ -62,13 +75,14 @@ lib = ->
     LazyLoad.js(js, ->
       for url in js
         loaded[url] = true
+        delete pending_urls[url]
       run_funcs()
     )
   
   # if everything is loaded, run funcs
-  if css.length is 0 && js.length is 0 && funcs.length > 0
-    for func in funcs
-      func()
+  if funcs.length > 0
+    pending_funcs[urls.join(' ')] = funcs
+    run_funcs()
   
   return {
     css: css
@@ -84,6 +98,7 @@ lib.loaded = ->
       for arg in args
         if typeof loaded[arg] is 'undefined'
           loaded[arg] = true
+      run_funcs()
     when 'del'
       for arg in args
         if typeof loaded[arg] isnt 'undefined'
