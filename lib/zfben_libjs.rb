@@ -19,8 +19,8 @@ end
 
 class Libjs
   def initialize config_file
-    @config_file = File.exists?(config_file) ? [config_file] : Dir[config_file + '*']
-    if @config_file.length == 0 || File.directory?(@config_file[0])
+    @config_file = File.exists?(config_file) ? [config_file] : Dir[config_file + '*'].select{ |f| !File.directory?(f) }
+    if @config_file.length == 0
       err config_file + ' is not exist!'
     else
       @config_file = @config_file[0]
@@ -84,9 +84,15 @@ class Libjs
       num = num + 1
       tip "[#{num}/#{length}] #{name}"
       urls = [urls] unless urls.class == Array
+      urls = urls.map{ |url|
+        if url.include?('*')
+          url = Dir[url]
+        end
+        url
+      }.flatten.uniq.compact
       lib = []
       urls.each do |url|
-        if @libs.has_key?(url)
+        if @libs.has_key?(url) && name != url
           lib.push(url)
         else
           path = File.join(@config['src/source'], name, File.basename(url))
@@ -95,15 +101,17 @@ class Libjs
           download url, path
           case get_filetype(path)
             when 'css'
-              css = css_import(url, dir)
+              css = "/* @import #{url} */\n" << css_import(url, dir)
               File.open(path, 'w'){ |f| f.write(css) }
               images = download_images(name, url, path)
               if images.length > 0
                 lib.push images
               end
+            when 'js'
+              js = "/* @import #{url} */\n" << File.read(path)
+              File.open(path, 'w'){ |f| f.write(js) }
             when 'rb'
               script = eval(File.read(path))
-              rb_path = path
               css = ''
               js = ''
               script.each do | type, content |
@@ -116,26 +124,26 @@ class Libjs
               end
               if css != ''
                 path = File.join(dir, File.basename(path, '.rb') << '.css')
-                File.open(path, 'w'){ |f| f.write("/* @import #{rb_path} */\n" + css) }
+                File.open(path, 'w'){ |f| f.write("/* @import #{url} */\n" + css) }
               elsif js != ''
                 path = File.join(dir, File.basename(path, '.rb') << '.js')
-                File.open(path, 'w'){ |f| f.write("/* @import #{rb_path} */\n" + js) }
+                File.open(path, 'w'){ |f| f.write("/* @import #{url} */\n" + js) }
               end
             when 'sass'
               options = { :syntax => :sass, :cache => false }.merge(Compass.sass_engine_options)
               options[:load_paths].push File.dirname(path), File.dirname(url)
-              css = "/* @import #{path} */\n" + Sass::Engine.new(File.read(path), options).render
-              path = File.join(dir, File.basename(path, '.sass') << '.css')
+              css = "/* @import #{url} */\n" + Sass::Engine.new(File.read(path), options).render
+              path = File.join(dir, File.basename(path) << '.css')
               File.open(path, 'w'){ |f| f.write(css) }
             when 'scss'
               options = { :syntax => :scss, :cache => false }.merge(Compass.sass_engine_options)
               options[:load_paths].push File.dirname(path), File.dirname(url)
-              css = "/* @import #{path} */\n" + Sass::Engine.new(File.read(path), options).render
-              path = File.join(dir, File.basename(path, '.sass') << '.css')
+              css = "/* @import #{url} */\n" + Sass::Engine.new(File.read(path), options).render
+              path = File.join(dir, File.basename(path) << '.css')
               File.open(path, 'w'){ |f| f.write(css) }
             when 'coffee'
-              js = "/* @import #{path} */\n" + CoffeeScript.compile(File.read(path))
-              path = File.join(dir, File.basename(path, '.coffee') << '.js')
+              js = "/* @import #{url} */\n" + CoffeeScript.compile(File.read(path))
+              path = File.join(dir, File.basename(path) << '.js')
               File.open(path, 'w'){ |f| f.write(js) }
             else
               lib.push url
@@ -185,7 +193,7 @@ class Libjs
           
           path = File.join(@config['src/' + type], File.basename(file))
           
-          p '=> ' + path
+          tip '=> ' + path
           
           system('cp ' + file + ' ' + path)
           

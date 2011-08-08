@@ -20,7 +20,9 @@ def download url, path
       exit!
     end
   else
-    system "cp #{url} #{path}" if File.exists?(url) && url != path
+    if File.exists?(url) && url != path
+      err 'Copy Error' unless system "cp #{url} #{path}"
+    end
   end
 end
 
