@@ -95,7 +95,7 @@ class Libjs
         if @libs.has_key?(url) && name != url
           lib.push(url)
         else
-          path = File.join(@config['src/source'], name, File.basename(url))
+          p path = File.join(@config['src/source'], name, File.basename(url))
           dir = File.dirname(path)
           system('mkdir ' + dir) unless File.exists?(dir)
           download url, path

@@ -4,6 +4,14 @@ libs = {}
 # save loaded source to `loaded`
 loaded = {}
 
+for link in document.getElementsByTagName('link')
+  if link.href && link.href isnt ''
+    loaded[link.href] = true
+
+for script in document.getElementsByTagName('script')
+  if script.src && script.src isnt ''
+    loaded[script.src] = true
+
 # pending
 pending_urls = {}
 pending_funcs = {}
@@ -34,25 +42,21 @@ lib = ->
   css = []
   js = []
   funcs = []
-  urls = []
   
   source_types = (args)->
     for arg in args
       switch typeof arg
         when 'string'
-          if typeof loaded[arg] is 'undefined' && typeof pending_urls[arg] is 'undefined'
-            if arg.indexOf(' ') >= 0
-              source_types(arg.split(' '))
+          if arg.indexOf(' ') >= 0
+            source_types(arg.split(' '))
+          else
+            if typeof libs[arg] isnt 'undefined'
+              source_types(libs[arg])
             else
-              if typeof libs[arg] isnt 'undefined' then source_types(libs[arg])
               if /\.css[^\.]*$/.test(arg)
                 css.push(arg)
-                urls.push(arg)
-                pending_urls[arg] = true
               if /\.js[^\.]*$/.test(arg)
                 js.push(arg)
-                urls.push(arg)
-                pending_urls[arg] = true
         when 'function'
           funcs.push(arg)
         else
@@ -61,25 +65,41 @@ lib = ->
   
   source_types(arguments)
   
+  urls = css.concat(js)
+  
   # progress css
-  if css.length > 0
-    LazyLoad.css(css, ->
-      for url in css
-        loaded[url] = true
+  pending_css = []
+  
+  for url in css
+    if typeof loaded[url] is 'undefined' && typeof pending_urls[url] is 'undefined'
+      pending_urls[url] = true
+      pending_css.push url
+  
+  if pending_css.length > 0
+    LazyLoad.css(pending_css, ->
+      for url in pending_css
         delete pending_urls[url]
+        loaded[url] = true
       run_funcs()
     )
   
   # progress js
+  pending_js = []
+  
+  for url in js
+    if typeof loaded[url] is 'undefined' && typeof pending_urls[url] is 'undefined'
+      pending_urls[url] = true
+      pending_js.push url
+  
   if js.length > 0
-    LazyLoad.js(js, ->
-      for url in js
-        loaded[url] = true
+    LazyLoad.js(pending_js, ->
+      for url in pending_js
         delete pending_urls[url]
+        loaded[url] = true
       run_funcs()
     )
   
-  # if everything is loaded, run funcs
+  # put funcs to pending_funcs
   if funcs.length > 0
     pending_funcs[urls.join(' ')] = funcs
     run_funcs()
@@ -107,16 +127,16 @@ lib.loaded = ->
 
 # change libs api
 lib.libs = (new_libs)->
-  for name, urls of new_libs
+  for lib_name, urls of new_libs
+    delete(libs[lib_name])
+    delete(lib[lib_name])
     if urls isnt null
-      libs[name] = urls
-      ((name, urls)->
-        lib[name] = ->
-          lib(urls, arguments)
-      )(name, urls)
-    else
-      delete(libs[name])
-      delete(lib[name])
+      libs[lib_name] = urls
+      ((lib_name) ->
+        lib[lib_name] = ->
+          args = [lib_name].concat(Array.prototype.slice.call(arguments))
+          lib.apply(this, args)
+      )(lib_name)
   return libs
 
 window.lib = lib
