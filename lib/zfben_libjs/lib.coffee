@@ -117,12 +117,20 @@ lib.loaded = ->
     when 'add'
       for arg in args
         if typeof loaded[arg] is 'undefined'
-          loaded[arg] = true
+          if libs[arg]
+            for url in libs[arg]
+              loaded[url] = true
+          else
+            loaded[arg] = true
       run_funcs()
     when 'del'
       for arg in args
         if typeof loaded[arg] isnt 'undefined'
           delete(loaded[arg])
+        else
+          if libs[arg]
+            for url in libs[arg]
+              delete(loaded[url])
   return loaded
 
 # change libs api

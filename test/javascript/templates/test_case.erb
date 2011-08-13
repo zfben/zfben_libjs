@@ -1,17 +1,17 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 <html>
   <head>
     <meta http-equiv="Content-type" content="text/html; charset=utf-8">
-    <title><%= "#{@test_case.name} - Hanoi" %></title>
+    <title><%= @test_case.name %></title>
 
-    <script src="/jquery.js" type="text/javascript" charset="utf-8"></script>
-    <script src="/qunit.js" type="text/javascript" charset="utf-8"></script>
-    <link rel="stylesheet" href="/qunit.css" type="text/css" media="screen" charset="utf-8">
+    <script src="http://code.jquery.com/jquery.min.js"></script>
+    <script src="http://code.jquery.com/qunit/qunit-git.js"></script>
+    <script src="/callback.js"></script>
+    <link rel="stylesheet" href="http://code.jquery.com/qunit/qunit-git.css" type="text/css" media="screen" />
   
     <script src="<%= @test_case.target %>" type="text/javascript" charset="utf-8"></script>
 
-    <script type="text/javascript" charset="utf-8">
+    <script>
       $(document).ready(function(){
        <%= @test_case.content %>
       });
@@ -19,7 +19,7 @@
 
   </head>
   <body>
-    <h1 id="qunit-header"><%= "#{@test_case.name.upcase}" %></h1>
+    <h1 id="qunit-header"><%= @test_case.name.upcase %></h1>
     <h2 id="qunit-banner"></h2>
     <div id="qunit-testrunner-toolbar"></div>
     <h2 id="qunit-userAgent"></h2>
