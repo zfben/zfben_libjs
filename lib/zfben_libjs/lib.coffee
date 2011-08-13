@@ -117,7 +117,7 @@ lib.loaded = ->
     when 'add'
       for arg in args
         if typeof loaded[arg] is 'undefined'
-          if libs[arg]
+          if typeof libs[arg] isnt 'undefined'
             for url in libs[arg]
               loaded[url] = true
           else
@@ -128,7 +128,7 @@ lib.loaded = ->
         if typeof loaded[arg] isnt 'undefined'
           delete(loaded[arg])
         else
-          if libs[arg]
+          if typeof libs[arg] isnt 'undefined'
             for url in libs[arg]
               delete(loaded[url])
   return loaded
@@ -147,5 +147,4 @@ lib.libs = (new_libs)->
       )(lib_name)
   return libs
 
-lib.loaded('add', 'lazyload')
 window.lib = lib

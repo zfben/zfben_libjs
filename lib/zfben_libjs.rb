@@ -260,7 +260,7 @@ class Libjs
       @urls[lib] = path
     end
     
-    libjs << "\n/* libs */\nlib.libs(#{@urls.to_json});"
+    libjs << "\n/* libs */\nlib.libs(#{@urls.to_json});lib.loaded('add', 'lazyload');"
     
     if @bundle != nil && @bundle.length > 0
       @bundle.each do |name, libs|
