@@ -147,4 +147,5 @@ lib.libs = (new_libs)->
       )(lib_name)
   return libs
 
+lib.loaded('add', 'lazyload')
 window.lib = lib
