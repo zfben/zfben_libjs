@@ -19,7 +19,7 @@ end
 
 class Libjs
   def initialize config_file
-    @config_file = File.exists?(config_file) ? [config_file] : Dir[config_file + '*'].select{ |f| !File.directory?(f) }
+    @config_file = File.exists?(config_file) && !File.directory?(config_file) ? [config_file] : Dir[config_file + '*'].select{ |f| !File.directory?(f) }
     if @config_file.length == 0
       err config_file + ' is not exist!'
     else
@@ -151,7 +151,7 @@ class Libjs
           lib.push(path)
         end
       end
-      lib = lib.flatten
+      lib = lib.flatten.uniq
       
       css = ''
       js = ''
@@ -244,6 +244,7 @@ class Libjs
     libjs << libjs_core << ';'
     
     @urls = {}
+    
     @libs.each do |lib, path|
       path = [path] unless path.class == Array
       path = path.map{ |url|
@@ -261,6 +262,10 @@ class Libjs
     end
     
     libjs << "\n/* libs */\nlib.libs(#{@urls.to_json});lib.loaded('add', 'lazyload');"
+    
+    if @config['autoVersion']
+      libjs << Time.now.strftime('lib.defaults.version = "?%s";')
+    end
     
     if @bundle != nil && @bundle.length > 0
       @bundle.each do |name, libs|

@@ -76,7 +76,13 @@ lib = ->
       pending_css.push url
   
   if pending_css.length > 0
-    LazyLoad.css(pending_css, ->
+    loading_css = []
+    if lib.defaults.version
+      for url in pending_css
+        loading_css.push url + lib.defaults.version
+    else
+      loading_css = pending_css
+    LazyLoad.css(loading_css, ->
       for url in pending_css
         delete pending_urls[url]
         loaded[url] = true
@@ -92,7 +98,13 @@ lib = ->
       pending_js.push url
   
   if js.length > 0
-    LazyLoad.js(pending_js, ->
+    loading_js = []
+    if lib.defaults.version
+      for url in pending_js
+        loading_js.push url + lib.defaults.version
+    else
+      loading_js = pending_js
+    LazyLoad.js(loading_js, ->
       for url in pending_js
         delete pending_urls[url]
         loaded[url] = true
@@ -146,5 +158,7 @@ lib.libs = (new_libs)->
           lib.apply(this, args)
       )(lib_name)
   return libs
+
+lib.defaults = {}
 
 window.lib = lib
