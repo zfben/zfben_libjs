@@ -1,10 +1,9 @@
 # -*- encoding: utf-8 -*-
 $:.push File.expand_path("../lib", __FILE__)
-require "zfben_libjs/version"
 
 Gem::Specification.new do |s|
   s.name        = "zfben_libjs"
-  s.version     = ZfbenLibjs::VERSION
+  s.version     = '0.0.8'
   s.authors     = ["Ben"]
   s.email       = ["ben@zfben.com"]
   s.homepage    = "https://github.com/benz303/zfben_libjs"

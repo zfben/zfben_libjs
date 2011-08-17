@@ -17,7 +17,7 @@ else
       tip "Create #{folder}/libjs.yml\nYou can change it then use `libjs #{folder}/libjs` to build it"
     end
   else
-    lib = Libjs.new(args[0])
+    lib = Zfben_libjs::Libjs.new(args[0])
     if args.length == 1
       lib.build!
     end
