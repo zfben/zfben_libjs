@@ -331,7 +331,7 @@ module Zfben_libjs
   
   Lib_version ||= Time.now.strftime('?%s')
   
-  if Rails
+  if defined?(Rails)
     module Rails
       module ActionView::Helpers::AssetTagHelper
         def lib *opt
