@@ -2,6 +2,16 @@
 
 Lib.js = Frontend build tool + lazyload js tool
 
+== Getting Started
+
+ 1. Install zfben_libjs
+
+  gem install zfben_libjs
+
+ 2. Create new libjs project
+
+  libjs new
+
 == Feature:
 
 lazyload css and js files (base on LazyLoad.js)
@@ -32,7 +42,7 @@ support before and after events
 
 .rb     -   ruby
 
-== Example
+== Javascript Example
 
   // load jquery
   lib.jquery(function(){
@@ -53,12 +63,16 @@ support before and after events
     // use jquery and underscore to do sth.
   });
 
-== Getting Started
+== Rails Example
 
- 1. Install zfben_libjs
+  # Gemfile
+  gem 'zfben_libjs'
 
-  gem install zfben_libjs
+  # layout.html.erb
 
- 2. Create new libjs project
-
-  libjs new
+  <%= lib %>
+  # => <script src="/javascripts/lib.js?12345678"></script>
+  
+  # OR
+  <%= lib :home %>
+  # => <script src="/javascripts/lib.js?12345678"></script><script>lib('home')</script>
