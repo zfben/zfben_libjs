@@ -1,1 +1,1 @@
-{ :css => '.rb_css{ font-size: 4px }' }
+{ :css => '.rb_css{ color: rgb(0,0,4) !important }' }

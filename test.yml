@@ -8,9 +8,16 @@ config:
 
 # Files to be download and writen in lib.js
 libs:
-  support_filetype:
-    - test/support_filetype/*
-  unload:
-    - test/unload.js
-  load_times:
-    - test/load_times.js
+  support_filetype: test/support_filetype/*
+  
+  unload: test/unload.js
+  
+  load_times: test/load_times.js
+  
+  route_string: test/route_string.js
+  
+  route_regexp: test/route_regexp.js
+
+routes:
+  "#Test_StringRoute": route_string
+  "/#Test_RegExpRoute/": route_regexp

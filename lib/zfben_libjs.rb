@@ -71,6 +71,8 @@ module Zfben_libjs
       
       @bundle = @data['bundle']
       
+      @routes = @data['routes']
+      
       @preload = @data['preload']
       
       if @config.has_key?('before')
@@ -202,10 +204,14 @@ module Zfben_libjs
             if type == 'stylesheets' && @config['changeImageUrl'] && reg =~ File.read(path)
               css = File.read(path).partition_all(reg).map{ |f|
                 if reg =~ f
-                  if @config['url'] == ''
-                    f = 'url("../images/' << File.basename(f.match(reg)[1]) << '")'
-                  else
-                    f = 'url("' + @config['url/images'] + File.basename(f.match(reg)[1]) << '")'
+                  filename = File.basename(f.match(reg)[1])
+                  if File.exists?(File.join(@config['src/images'], filename))
+                    if @config['url'] == ''
+                      url = '../images/' << File.basename(f.match(reg)[1])
+                    else
+                      url = @config['url/images'] + File.basename(f.match(reg)[1])
+                    end
+                    f = 'url("' << url << '")'
                   end
                 end
                 f
@@ -314,6 +320,15 @@ module Zfben_libjs
         libjs << "\n/* bundle */\nlib.libs(#{@bundle.to_json});"
       end
       
+      if defined?(@routes)
+        routes = {}
+        @routes.each do |path, lib_name|
+          lib_name = lib_name.join ' ' if lib_name.class == Array
+          routes[path] = lib_name
+        end
+        libjs << "\n/* routes */\nlib.routes('add', #{routes.to_json});"
+      end
+      
       if @preload.class == Array && @preload.length > 0
         libjs << "\n/* preload */\nlib('#{@preload.join(' ')}');"
       end
@@ -334,10 +349,11 @@ module Zfben_libjs
   if defined?(Rails)
     module Rails
       module ActionView::Helpers::AssetTagHelper
-        def lib *opt
+        def lib *opts
+          p opts
           html = '<script src="/javascripts/lib.js' + Lib_version + '"></script>'
-          unless opt[0].blank?
-            html += '<script>lib("' + opt[0].to_s + '");</script>'
+          unless opts.blank?
+            html += "<script>lib('#{opts.join(' ')}')</script>"
           end
           return html
         end

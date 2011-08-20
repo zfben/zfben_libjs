@@ -2,8 +2,8 @@
 $:.push File.expand_path("../lib", __FILE__)
 
 Gem::Specification.new do |s|
-  s.name        = "zfben_libjs"
-  s.version     = '0.0.9'
+  s.name        = 'zfben_libjs'
+  s.version     = '0.0.10'
   s.authors     = ["Ben"]
   s.email       = ["ben@zfben.com"]
   s.homepage    = "https://github.com/benz303/zfben_libjs"
@@ -17,8 +17,6 @@ Gem::Specification.new do |s|
   https://twitter.com/zfben
 ********************************************************************************
 }
-
-  s.rubyforge_project = "zfben_libjs"
 
   s.files         = `git ls-files`.split("\n")
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")

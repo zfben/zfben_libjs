@@ -77,11 +77,13 @@ lib = ->
   
   if pending_css.length > 0
     loading_css = []
+
     if lib.defaults.version
       for url in pending_css
         loading_css.push url + lib.defaults.version
     else
       loading_css = pending_css
+
     LazyLoad.css(loading_css, ->
       for url in pending_css
         delete pending_urls[url]
@@ -97,13 +99,15 @@ lib = ->
       pending_urls[url] = true
       pending_js.push url
   
-  if js.length > 0
+  if pending_js.length > 0
     loading_js = []
+
     if lib.defaults.version
       for url in pending_js
         loading_js.push url + lib.defaults.version
     else
       loading_js = pending_js
+
     LazyLoad.js(loading_js, ->
       for url in pending_js
         delete pending_urls[url]
@@ -114,7 +118,8 @@ lib = ->
   # put funcs to pending_funcs
   if funcs.length > 0
     pending_funcs[urls.join(' ')] = funcs
-    run_funcs()
+  
+  run_funcs()
   
   return {
     css: css
@@ -161,4 +166,39 @@ lib.libs = (new_libs)->
 
 lib.defaults = {}
 
+# Route
+routes = {}
+last_location = ''
+
+path2regex = (path)->
+  if path[0] is '/' && path[path.length - 1] is '/'
+    path = path[1..(path.length - 2)]
+  return path
+
+lib.routes = (method, args)->
+  switch method
+    when 'add'
+      for path, lib_name of args
+        routes[path2regex(path)] = lib_name
+      last_location = ''
+    when 'del'
+      for path, lib_name of args
+        delete(routes[path2regex(path)])
+  return routes
+
+Location_watch = ->
+  location_path = location.hostname + location.pathname + location.hash
+  if location_path isnt last_location
+    libs_name = []
+    for path, lib_name of routes
+      if RegExp(path).test location_path
+        libs_name.push lib_name
+    if libs_name.length > 0
+      lib(libs_name.join(' '))
+    last_location = location_path
+  setTimeout(->
+    Location_watch()
+  , 200)
+
 window.lib = lib
+Location_watch()

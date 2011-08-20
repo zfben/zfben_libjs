@@ -51,7 +51,9 @@ test('lib.libs', 6, function(){
       '/javascripts/support_filetype.js'
     ],
     unload: [ '/javascripts/unload.js' ],
-    load_times: [ '/javascripts/load_times.js' ]
+    load_times: [ '/javascripts/load_times.js' ],
+    route_string: [ '/javascripts/route_string.js' ],
+    route_regexp: [ '/javascripts/route_regexp.js' ]
   }, 'lib.libs is ok');
   
   equal(typeof lib.lazyload, 'function', 'lib.lazyload is a function');
@@ -64,6 +66,8 @@ test('lib.libs', 6, function(){
     ],
     unload: [ '/javascripts/unload.js' ],
     load_times: [ '/javascripts/load_times.js' ],
+    route_string: [ '/javascripts/route_string.js' ],
+    route_regexp: [ '/javascripts/route_regexp.js' ],
     test: 'test'
   }, "lib.libs({test: 'test'}) has been added");
   
@@ -76,7 +80,9 @@ test('lib.libs', 6, function(){
       '/javascripts/support_filetype.js'
     ],
     unload: [ '/javascripts/unload.js' ],
-    load_times: [ '/javascripts/load_times.js' ]
+    load_times: [ '/javascripts/load_times.js' ],
+    route_string: [ '/javascripts/route_string.js' ],
+    route_regexp: [ '/javascripts/route_regexp.js' ]
   }, "lib.libs({test: null}) has been deleted");
   
   equal(typeof lib.test, 'undefined', 'lib.test is undefined');
@@ -108,10 +114,10 @@ module('support_filetype');
 
 asyncTest('stylesheet', 4, function() {
   lib.support_filetype(function(){
-    equal($('.css').css('font-size'), '1px', 'css file loaded');
-    equal($('.sass').css('font-size'), '2px', 'sass file loaded');
-    equal($('.scss').css('font-size'), '3px', 'scss file loaded');
-    equal($('.rb_css').css('font-size'), '4px', 'rb_css file loaded');
+    equal($('.css').css('color'), 'rgb(0, 0, 1)', 'css file loaded');
+    equal($('.sass').css('color'), 'rgb(0, 0, 2)', 'sass file loaded');
+    equal($('.scss').css('color'), 'rgb(0, 0, 3)', 'scss file loaded');
+    equal($('.rb_css').css('color'), 'rgb(0, 0, 4)', 'rb_css file loaded');
     start();
   });
 });
@@ -123,4 +129,25 @@ asyncTest('javascript', 3, function() {
     equal(rb_js, true, 'rb_js file loaded');
     start();
   });
+});
+
+
+module('lib.routes');
+
+asyncTest('String route', 1, function(){
+  location.hash = '#Test_StringRoute';
+  
+  setTimeout(function(){
+    ok(route_string, 'String route is applied');
+    start();
+  }, 1000);
+});
+
+asyncTest('RegExp route', 1, function(){
+  location.hash = '#Test_RegExpRoute';
+  
+  setTimeout(function(){
+    ok(route_regexp, 'RegExp route is applied');
+    start();
+  }, 1000);
 });
