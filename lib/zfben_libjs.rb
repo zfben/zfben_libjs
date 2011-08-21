@@ -320,7 +320,7 @@ module Zfben_libjs
         libjs << "\n/* bundle */\nlib.libs(#{@bundle.to_json});"
       end
       
-      if defined?(@routes)
+      if defined?(@routes) && !@routes.nil?
         routes = {}
         @routes.each do |path, lib_name|
           lib_name = lib_name.join ' ' if lib_name.class == Array
