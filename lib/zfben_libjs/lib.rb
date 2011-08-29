@@ -13,7 +13,7 @@ def get_filetype path
 end
 
 def download url, path
-  if url =~ /:\/\// && (@config['download'] == true || !File.exists?(path))
+  if url =~ /:\/\// && (@opts[:config]['download'] == true || !File.exists?(path))
     unless system 'wget ' + url + ' -O ' + path + ' -N'
       p url + ' download fail!'
       system('rm ' + path)

@@ -12,4 +12,11 @@ namespace :test do
 
     t.setup(sources_directory, test_cases, browsers)
   end
+  
+  desc 'Runs all the Ruby tests'
+  task :ruby do
+    require File.realpath('lib/zfben_libjs.rb')
+    require 'test/unit'
+    Dir['test/ruby/*_test.rb'].each{ |f| require File.realpath(f) }
+  end
 end

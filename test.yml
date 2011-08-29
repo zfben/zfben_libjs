@@ -4,7 +4,6 @@ config:
   download: false       # if file isn't exists, it will be downloaded always
   minify: false         # use uglifier and sass engine to minify files
   changeImageUrl: true  # change image urls in css
-  autoVersion: true     # add version to files url
 
 # Files to be download and writen in lib.js
 libs:

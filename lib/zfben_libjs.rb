@@ -1,4 +1,5 @@
 require 'rubygems'
+require 'fileutils'
 require 'rainbow'
 require 'json'
 require 'compass'
@@ -6,13 +7,14 @@ require 'coffee-script'
 require 'uglifier'
 require 'yaml'
 require 'sass/css'
+require 'active_support/core_ext'
 
 module Zfben_libjs
-  class Libjs << self
+  class Libjs
   end
 end
 
-['lib.rb', 'initialize.rb'].each { |f| require File.join(File.dirname(__FILE__), 'zfben_libjs', f) }
+['lib.rb', 'initialize.rb', 'railtie.rb'].each { |f| require File.join(File.dirname(__FILE__), 'zfben_libjs', f) }
   
 def err msg
   STDERR.print "#{msg}\n".color(:red)
@@ -24,46 +26,13 @@ def tip msg
 end
 
 module Zfben_libjs
-  class Libjs << self
+  class Libjs
     
     def build!
-      tip '== Starting Build @' + @config_file
-
-      # Merge default config
-      @config = {
-        'src' => 'src',
-        'download' => false,
-        'minify' => true,
-        'url' => ''
-      }.merge(@data['config'])
+      tip '== Starting Build'
       
-      @config['src'] = File.join(File.dirname(@config_file), @config['src'])
-      system('mkdir ' + @config['src']) unless File.exists?(@config['src'])
-      
-      ['source'].each do |path|
-        @config['src/' + path] = File.join(@config['src'], '.' + path) unless @config.has_key?('src/' + path)
-        system('mkdir ' + @config['src/' + path]) unless File.exists?(@config['src/' + path])
-      end
-      
-      ['javascripts', 'stylesheets', 'images'].each do |path|
-        @config['url/' + path] = @config['url'] + '/' + path unless @config.has_key?('url/' + path)
-        @config['src/' + path] = File.join(@config['src'], path) unless @config.has_key?('src/' + path)
-        system('mkdir ' + @config['src/' + path]) unless File.exists?(@config['src/' + path])
-      end
-
-      # Merge default libs
-      @libs = {
-        'lazyload' => 'https://raw.github.com/rgrove/lazyload/master/lazyload.js'
-      }.merge(@data['libs'])
-      
-      @bundle = @data['bundle']
-      
-      @routes = @data['routes']
-      
-      @preload = @data['preload']
-      
-      if @config.has_key?('before')
-        load @config['before']
+      if @opts[:config].has_key?('before')
+        load @opts[:config]['before']
       end
       
       
@@ -85,7 +54,7 @@ module Zfben_libjs
           if @libs.has_key?(url) && name != url
             lib.push(url)
           else
-            p path = File.join(@config['src/source'], name, File.basename(url))
+            p path = File.join(@opts[:config]['src/source'], name, File.basename(url))
             dir = File.dirname(path)
             system('mkdir ' + dir) unless File.exists?(dir)
             download url, path
@@ -160,12 +129,12 @@ module Zfben_libjs
           file
         }.compact
         if css != ''
-          file = File.join(@config['src/source'], name + '.css')
+          file = File.join(@opts[:config]['src/source'], name + '.css')
           File.open(file, 'w'){ |f| f.write(css) }
           lib.push(file)
         end
         if js != ''
-          file = File.join(@config['src/source'], name + '.js')
+          file = File.join(@opts[:config]['src/source'], name + '.js')
           File.open(file, 'w'){ |f| f.write(js) }
           lib.push(file)
         end
@@ -181,22 +150,22 @@ module Zfben_libjs
                 type = 'images'
             end
             
-            path = File.join(@config['src/' + type], File.basename(file))
+            path = File.join(@opts[:config]['src/' + type], File.basename(file))
             
             tip '=> ' + path
             
             system('cp ' + file + ' ' + path)
             
             reg = /url\("?'?([^'")]+)'?"?\)/
-            if type == 'stylesheets' && @config['changeImageUrl'] && reg =~ File.read(path)
+            if type == 'stylesheets' && @opts[:config]['changeImageUrl'] && reg =~ File.read(path)
               css = File.read(path).partition_all(reg).map{ |f|
                 if reg =~ f
                   filename = File.basename(f.match(reg)[1])
-                  if File.exists?(File.join(@config['src/images'], filename))
-                    if @config['url'] == ''
+                  if File.exists?(File.join(@opts[:config]['src/images'], filename))
+                    if @opts[:config]['url'] == ''
                       url = '../images/' << File.basename(f.match(reg)[1])
                     else
-                      url = @config['url/images'] + File.basename(f.match(reg)[1])
+                      url = @opts[:config]['url/images'] + File.basename(f.match(reg)[1])
                     end
                     f = 'url("' << url << '")'
                   end
@@ -209,7 +178,7 @@ module Zfben_libjs
               path = nil
             end
             
-            if @config['minify']
+            if @opts[:config]['minify']
               if type == 'stylesheets'
                 min = minify(File.read(path), :css)
                 File.open(path, 'w'){ |f| f.write(min) }
@@ -244,9 +213,9 @@ module Zfben_libjs
         path = path.map{ |url|
           case File.extname(url)
             when '.css'
-              url = @config['url/stylesheets'] + '/' + File.basename(url)
+              url = @opts[:config]['url/stylesheets'] + '/' + File.basename(url)
             when '.js'
-              url = @config['url/javascripts'] + '/' + File.basename(url)
+              url = @opts[:config]['url/javascripts'] + '/' + File.basename(url)
             else
               url = nil
           end
@@ -256,13 +225,11 @@ module Zfben_libjs
       end
       
       libjs << "\n/* libs */\nlib.libs(#{@urls.to_json});lib.loaded('add', 'lazyload');"
+      libjs << Time.now.strftime('lib.defaults.version = "?%s";')
       
-      if @config['autoVersion']
-        libjs << Time.now.strftime('lib.defaults.version = "?%s";')
-      end
-      
-      if @bundle != nil && @bundle.length > 0
-        @bundle.each do |name, libs|
+      if @opts.has_key?(:bundle)
+        bundle = {}
+        @opts[:bundle].each do |name, libs|
           css = ''
           js = ''
           files = []
@@ -283,69 +250,50 @@ module Zfben_libjs
           path = []
           
           if css != ''
-            file = File.join(@config['src/stylesheets'], name + '.css')
+            file = File.join(@opts[:config]['src/stylesheets'], name + '.css')
             File.open(file, 'w'){ |f| f.write(css) }
-            path.push(@config['url/stylesheets'] + '/' + File.basename(file))
+            path.push(@opts[:config]['url/stylesheets'] + '/' + File.basename(file))
           end
           
           if js != ''
-            files_url = files.map{ |f| @config['url/javascripts'] + '/' + File.basename(f) }.join("','")
+            files_url = files.map{ |f| @opts[:config]['url/javascripts'] + '/' + File.basename(f) }.join("','")
             js << "\nif(typeof lib === 'function'){lib.loaded('add', '#{files_url}');}"
-            file = File.join(@config['src/javascripts'], name + '.js')
+            file = File.join(@opts[:config]['src/javascripts'], name + '.js')
             File.open(file, 'w'){ |f| f.write(js) }
-            path.push(@config['url/javascripts'] + '/' + File.basename(file))
+            path.push(@opts[:config]['url/javascripts'] + '/' + File.basename(file))
           end
           
           if path.length > 0
             path = path[0] if path.length == 0
-            @bundle[name] = path
-          else
-            @bundle.delete(name)
+            bundle[name] = path
           end
         end
         
-        libjs << "\n/* bundle */\nlib.libs(#{@bundle.to_json});"
+        libjs << "\n/* bundle */\nlib.libs(#{bundle.to_json});"
       end
       
-      if defined?(@routes) && !@routes.nil?
+      if @opts.has_key?(:routes)
         routes = {}
-        @routes.each do |path, lib_name|
+        @opts[:routes].each do |path, lib_name|
           lib_name = lib_name.join ' ' if lib_name.class == Array
           routes[path] = lib_name
         end
         libjs << "\n/* routes */\nlib.routes('add', #{routes.to_json});"
       end
       
-      if @preload.class == Array && @preload.length > 0
-        libjs << "\n/* preload */\nlib('#{@preload.join(' ')}');"
+      if @opts.has_key?(:preload)
+        preload = @opts[:preload].class == Array ? @opts[:preload] : [ @opts[:preload] ]
+        libjs << "\n/* preload */\nlib('#{preload.join(' ')}');"
       end
       
-      libjs = minify(libjs, :js) if @config['minify']
-      File.open(File.join(@config['src/javascripts'], 'lib.js'), 'w'){ |f| f.write(libjs) }
+      libjs = minify(libjs, :js) if @opts[:config]['minify']
+      File.open(File.join(@opts[:config]['src/javascripts'], 'lib.js'), 'w'){ |f| f.write(libjs) }
       
-      if @config.has_key?('after')
-        load @config['after']
+      if @opts[:config].has_key?('after')
+        load @opts[:config]['after']
       end
       
       tip '== End Build =='
     end
   end
-  
-  Lib_version ||= Time.now.strftime('?%s')
-  
-  if defined?(Rails)
-    module Rails
-      module ActionView::Helpers::AssetTagHelper
-        def lib *opts
-          p opts
-          html = '<script src="/javascripts/lib.js' + Lib_version + '"></script>'
-          unless opts.blank?
-            html += "<script>lib('#{opts.join(' ')}')</script>"
-          end
-          return html
-        end
-      end
-    end
-  end
 end
-
