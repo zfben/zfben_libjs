@@ -77,7 +77,7 @@ support before and after events
   # => <script src="/javascripts/lib.js?12345678"></script><script>lib('home')</script>
 
   <%= lib 'home.css' %>
-  # => <script src="/javascripts/lib.js?12345678"></script><link rel="stylesheet" href="/stylesheets/home.css?12345678" />
+  # => <link rel="stylesheet" href="/stylesheets/home.css?12345678" /><script src="/javascripts/lib.js?12345678"></script>
 
   <%= lib 'home.js' %>
-  # => <script src="/javascripts/lib.js?12345678"></script><script src="/javascripts/home.js?12345678"></script>
+  # => <script src="/javascripts/home.js?12345678"></script><script src="/javascripts/lib.js?12345678"></script>

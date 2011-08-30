@@ -25,19 +25,15 @@ def tip msg
   STDOUT.print "#{msg}\n".color(:green)
 end
 
-module Zfben_libjs
-  class Libjs
-    
-    def build!
-      tip '== Starting Build'
-      
-      if @opts[:config].has_key?('before')
-        load @opts[:config]['before']
-      end
-      
-      
-      tip '== [1/2] Starting Progress Source =='
-      length = @libs.length
+class Zfben_libjs::Libjs
+  def build!
+    tip '== Starting Build'
+     
+    if @opts[:config].has_key?('before')
+      load @opts[:config]['before']
+    end
+    tip '== [1/2] Starting Progress Source =='
+    length = @libs.length
       num = 0
       @libs.each do |name, urls|
         num = num + 1
@@ -295,5 +291,4 @@ module Zfben_libjs
       
       tip '== End Build =='
     end
-  end
 end

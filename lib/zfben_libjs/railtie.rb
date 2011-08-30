@@ -3,7 +3,7 @@ if defined?(Rails)
   module Rails
     module ActionView::Helpers::AssetTagHelper
       def lib *opts
-        html = lib_js('lib.js')
+        html = ''
         unless opts.blank?
           preload = []
           lib_preload = []
@@ -25,7 +25,7 @@ if defined?(Rails)
             end
           end
           if lib_preload.length > 0
-            html << "<script>lib('#{lib_preload.join(' ')}')</script>"
+            html << lib_js('lib.js') << "<script>lib('#{lib_preload.join(' ')}')</script>"
           end
         end
         return html
