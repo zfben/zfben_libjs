@@ -12,9 +12,12 @@ require 'active_support/core_ext'
 module Zfben_libjs
   class Libjs
   end
+
+  class Compile
+  end
 end
 
-['lib.rb', 'initialize.rb', 'railtie.rb'].each { |f| require File.join(File.dirname(__FILE__), 'zfben_libjs', f) }
+['lib.rb', 'source.rb', 'initialize.rb', 'railtie.rb'].each { |f| require File.join(File.dirname(__FILE__), 'zfben_libjs', f) }
   
 def err msg
   STDERR.print "#{msg}\n".color(:red)
@@ -54,6 +57,8 @@ class Zfben_libjs::Libjs
             dir = File.dirname(path)
             system('mkdir ' + dir) unless File.exists?(dir)
             download url, path
+            File.open(path, 'w'){ |f| f.write(Zfben_libjs.get_source(path).compile) }
+=begin
             case get_filetype(path)
               when 'css'
                 css = "/* @import #{url} */\n" << css_import(url, dir)
@@ -103,6 +108,7 @@ class Zfben_libjs::Libjs
               else
                 lib.push url
             end
+=end
             lib.push(path)
           end
         end

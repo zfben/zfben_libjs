@@ -17,8 +17,10 @@ class Zfben_libjs::Libjs
       'download' => false,
       'minify' => true,
       'changeImageUrl' => true
-      
     },
+    
+    :support_source => [],
+    
     :libs => {
       'lazyload' => 'https://raw.github.com/rgrove/lazyload/master/lazyload.js'
     },
@@ -26,6 +28,8 @@ class Zfben_libjs::Libjs
     :routes => {},
     :preload => {}
   }
+  
+  Default_options[:support_source] = Dir[File.join(File.dirname(__FILE__), 'support_source', '*.rb')]
 
   def initialize *opts
     
@@ -83,15 +87,20 @@ class Zfben_libjs::Libjs
   def merge_and_convert_options opts
     options = Default_options.clone
     
-    [:config, :libs, :bundle, :routes, :preload].each do |name|
+    opts = opts.symbolize_keys
+    
+    [:config, :libs, :bundle, :routes, :preload, :support_source].each do |name|
       if opts.has_key?(name)
-        options[name] = options[name].merge(opts[name])
-      else
-        if opts.has_key?(name.to_s)
-          options[name] = options[name].merge(opts[name.to_s])
+        case opts[name].class
+          when Hash
+            options[name] = options[name].merge(opts[name])
+          when Array
+            options[name] = options[name] + opts[name]
         end
       end
     end
+    
+    options[:support_source].each{ |f| require f }
     
     return options
   end

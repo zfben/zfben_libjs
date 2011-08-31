@@ -8,6 +8,20 @@ class String
   end
 end
 
+class Hash
+  def merges *hashes
+    if hashes.length < 1
+      self
+    else
+      merged = self
+      hashes.each do |hash|
+        merged = merged.merge hash
+      end
+      merged
+    end
+  end
+end
+
 def get_filetype path
   return File.extname(path).delete('.')
 end
