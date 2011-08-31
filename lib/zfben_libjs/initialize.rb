@@ -10,9 +10,9 @@ class Zfben_libjs::Libjs
       'src/stylesheets' => 'src/stylesheets',
 
       'url' => '',
-      'url/javascripts' => 'url/javascripts',
-      'url/images' => 'url/images',
-      'url/stylesheets' => 'url/stylesheets',
+      'url/javascripts' => '/javascripts',
+      'url/images' => '/images',
+      'url/stylesheets' => '/stylesheets',
       
       'download' => false,
       'minify' => true,
@@ -43,7 +43,7 @@ class Zfben_libjs::Libjs
         opts = {}
     end
     
-    @opts = merge_and_convert_options opts
+    @opts = merge_and_convert_options(opts)
     
     @path_gem = File.realpath(File.dirname(__FILE__))
     
@@ -91,11 +91,12 @@ class Zfben_libjs::Libjs
     
     [:config, :libs, :bundle, :routes, :preload, :support_source].each do |name|
       if opts.has_key?(name)
-        case opts[name].class
-          when Hash
+        case opts[name].class.to_s
+          when 'Hash'
+            p opts[name]
             options[name] = options[name].merge(opts[name])
-          when Array
-            options[name] = options[name] + opts[name]
+          when 'Array'
+            options[name] = (options[name] + opts[name]).uniq
         end
       end
     end

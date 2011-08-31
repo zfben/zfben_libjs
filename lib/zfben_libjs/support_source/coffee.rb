@@ -1,4 +1,8 @@
 class Zfben_libjs::Coffee < Zfben_libjs::Source
+  def to_js
+    compile
+  end
+
   def before_compile
     @compiled = CoffeeScript.compile(@source)
   end

@@ -2,6 +2,7 @@ class Zfben_libjs::Rb < Zfben_libjs::Source
   def self.new *options
     filepath = options[0][:filepath]
     if !filepath.nil?
+      p filepath
       script = eval(File.read(filepath))
       class_name = script.keys[0].capitalize
       source = script.values[0]

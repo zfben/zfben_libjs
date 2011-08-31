@@ -17,7 +17,7 @@ module Zfben_libjs
   end
 end
 
-['lib.rb', 'source.rb', 'initialize.rb', 'railtie.rb'].each { |f| require File.join(File.dirname(__FILE__), 'zfben_libjs', f) }
+['lib.rb', 'source.rb', 'initialize.rb', 'collection.rb', 'railtie.rb'].each { |f| require File.join(File.dirname(__FILE__), 'zfben_libjs', f) }
   
 def err msg
   STDERR.print "#{msg}\n".color(:red)
@@ -53,94 +53,36 @@ class Zfben_libjs::Libjs
           if @libs.has_key?(url) && name != url
             lib.push(url)
           else
-            p path = File.join(@opts[:config]['src/source'], name, File.basename(url))
-            dir = File.dirname(path)
-            system('mkdir ' + dir) unless File.exists?(dir)
-            download url, path
-            File.open(path, 'w'){ |f| f.write(Zfben_libjs.get_source(path).compile) }
-=begin
-            case get_filetype(path)
-              when 'css'
-                css = "/* @import #{url} */\n" << css_import(url, dir)
-                File.open(path, 'w'){ |f| f.write(css) }
-                images = download_images(name, url, path)
-                if images.length > 0
-                  lib.push images
-                end
-              when 'js'
-                js = "/* @import #{url} */\n" << File.read(path)
-                File.open(path, 'w'){ |f| f.write(js) }
-              when 'rb'
-                script = eval(File.read(path))
-                css = ''
-                js = ''
-                script.each do | type, content |
-                  case type
-                    when :css
-                      css << content
-                    when :js
-                      js << content
-                  end
-                end
-                if css != ''
-                  path = File.join(dir, File.basename(path, '.rb') << '.css')
-                  File.open(path, 'w'){ |f| f.write("/* @import #{url} */\n" + css) }
-                elsif js != ''
-                  path = File.join(dir, File.basename(path, '.rb') << '.js')
-                  File.open(path, 'w'){ |f| f.write("/* @import #{url} */\n" + js) }
-                end
-              when 'sass'
-                options = { :syntax => :sass, :cache => false }.merge(Compass.sass_engine_options)
-                options[:load_paths].push File.dirname(path), File.dirname(url)
-                css = "/* @import #{url} */\n" + Sass::Engine.new(File.read(path), options).render
-                path = File.join(dir, File.basename(path) << '.css')
-                File.open(path, 'w'){ |f| f.write(css) }
-              when 'scss'
-                options = { :syntax => :scss, :cache => false }.merge(Compass.sass_engine_options)
-                options[:load_paths].push File.dirname(path), File.dirname(url)
-                css = "/* @import #{url} */\n" + Sass::Engine.new(File.read(path), options).render
-                path = File.join(dir, File.basename(path) << '.css')
-                File.open(path, 'w'){ |f| f.write(css) }
-              when 'coffee'
-                js = "/* @import #{url} */\n" + CoffeeScript.compile(File.read(path))
-                path = File.join(dir, File.basename(path) << '.js')
-                File.open(path, 'w'){ |f| f.write(js) }
-              else
-                lib.push url
-            end
-=end
-            lib.push(path)
+            source = Zfben_libjs.get_source(url, @opts[:config])
+            lib.push(source)
           end
         end
         lib = lib.flatten.uniq
         
-        css = ''
-        js = ''
-        lib = lib.map{ |file|
-          if File.exists?(file)
-            content = "/* @import #{file} */\n" + File.read(file)
-            case File.extname(file)
-              when '.css'
-                css << content
-                file = nil
-              when '.js'
-                js << content << ';'
-                file = nil
-            end
-          end
-          file
-        }.compact
-        if css != ''
-          file = File.join(@opts[:config]['src/source'], name + '.css')
-          File.open(file, 'w'){ |f| f.write(css) }
-          lib.push(file)
-        end
-        if js != ''
-          file = File.join(@opts[:config]['src/source'], name + '.js')
-          File.open(file, 'w'){ |f| f.write(js) }
-          lib.push(file)
+        collection = Zfben_libjs::Collection.new(lib, @libs)
+        collection.merge!
+        
+        lib = []
+        
+        if collection.css.length > 0
+          path = File.join(@opts[:config]['src/stylesheets'], name + '.css')
+          File.open(path, 'w'){ |f| f.write(collection.merge_css) }
+          lib.push path
         end
         
+        if collection.js.length > 0
+          path = File.join(@opts[:config]['src/javascripts'], name + '.js')
+          File.open(path, 'w'){ |f| f.write(collection.merge_js) }
+          lib.push path
+        end
+        
+        if collection.image.length > 0
+          lib.push collection.image
+        end
+        
+        @libs[name] = lib.flatten.compact.uniq
+      end
+=begin
         @libs[name] = lib.map{ |file|
           if File.exists?(file)
             case File.extname(file)
@@ -197,7 +139,7 @@ class Zfben_libjs::Libjs
         }.compact.flatten.uniq
         @libs[name] = @libs[name][0] if @libs[name].length == 1
       end
-      
+=end
       tip '== [2/2] Generate lib.js =='
       
       libjs = File.read(@libs['lazyload']) << ';'
@@ -209,7 +151,8 @@ class Zfben_libjs::Libjs
       libjs << libjs_core << ';'
       
       @urls = {}
-      
+     
+      p @libs
       @libs.each do |lib, path|
         path = [path] unless path.class == Array
         path = path.map{ |url|

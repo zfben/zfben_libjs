@@ -4,6 +4,10 @@ class Zfben_libjs::Scss < Zfben_libjs::Source
     @options[:load_paths].push File.dirname(@filepath)
   end
 
+  def to_css
+    compile
+  end
+
   def before_compile
     @compiled = Sass::Engine.new(@source, @options).render
   end

@@ -1,7 +1,6 @@
 module Zfben_libjs
 
   def self.get_source filepath, *options
-    source = File.read(filepath)
     type = File.extname(filepath).delete('.')
 
     class_name = type.capitalize
@@ -11,7 +10,7 @@ module Zfben_libjs
       raise Exception.new(class_name + ' isn\'t exists!')
     end
 
-    return source_class.new :filepath => filepath, :source => source, :options => options[0]
+    return source_class.new :filepath => filepath, :options => options[0]
   end
 
   class Source
@@ -24,11 +23,31 @@ module Zfben_libjs
 
       @options = {} if @options.nil?
 
+      if remote?
+        download!
+      end
+
+      @source = @source || File.read(@filepath)
+
       after_initialize if self.respond_to?(:after_initialize)
     end
 
+    def remote?
+      return /^https?:\/\// =~ @filepath
+    end
+
+    def download!
+      @remote_path = @filepath
+      @filepath = File.join(@options['src/source'], '.download', File.basename(@remote_path))
+      FileUtils.mkdir(File.dirname(@filepath)) unless File.exists?(File.dirname(@filepath))
+      unless system 'wget ' + @remote_path + ' -O ' + @filepath
+        FileUtils.rm @filepath
+        raise Exception.new(@remote_path + ' download failed!')
+      end
+    end
+
     def name
-      self.class.to_s.downcase
+      self.class.to_s.downcase.gsub(/Zfben_libjs::/, '')
     end
 
     def compile

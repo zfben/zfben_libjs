@@ -3,6 +3,10 @@ class Zfben_libjs::Css < Zfben_libjs::Source
     @options = @options.merge({ :syntax => :sass, :style => :compressed, :cache => false })
   end
 
+  def to_css
+    @source
+  end
+
   def to_sass
     Sass::CSS.new(@source, @options).render(:sass)
   end
@@ -12,7 +16,7 @@ class Zfben_libjs::Css < Zfben_libjs::Source
   end
 
   def download_images
-    @source.
+    @source
   end
 
   def before_minify
