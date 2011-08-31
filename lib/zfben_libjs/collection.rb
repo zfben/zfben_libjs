@@ -8,7 +8,7 @@ class Zfben_libjs::Collection
     @js = []
     @image = []
     
-    process_sources sources
+    process_sources sources.flatten.uniq.compact, libs
   end
   
   def merge!
@@ -35,10 +35,10 @@ class Zfben_libjs::Collection
   def process_sources sources, libs
     sources.each do |source|
       if source.class.to_s == 'String'
-        process_sources libs[source]
-      elsif source.respond_to(:to_css)
+        process_sources libs[source], libs
+      elsif source.respond_to?(:to_css)
         @css.push source
-      elsif source.respond_to(:to_js)
+      elsif source.respond_to?(:to_js)
         @js.push source
       else
         @image.push source

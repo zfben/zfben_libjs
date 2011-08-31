@@ -115,9 +115,9 @@ module('support_filetype');
 asyncTest('stylesheet', 4, function() {
   lib.support_filetype(function(){
     equal($('.css').css('color'), 'rgb(0, 0, 1)', 'css file loaded');
-    equal($('.sass').css('color'), 'rgb(0, 0, 2)', 'sass file loaded');
-    equal($('.scss').css('color'), 'rgb(0, 0, 3)', 'scss file loaded');
-    equal($('.rb_css').css('color'), 'rgb(0, 0, 4)', 'rb_css file loaded');
+    equal($('.sass').css('color'), 'rgb(0, 0, 1)', 'sass file loaded');
+    equal($('.scss').css('color'), 'rgb(0, 0, 1)', 'scss file loaded');
+    equal($('.rb_css').css('color'), 'rgb(0, 0, 1)', 'rb_css file loaded');
     start();
   });
 });

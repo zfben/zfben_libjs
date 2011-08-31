@@ -57,7 +57,7 @@ class Zfben_libjs::Libjs
             lib.push(source)
           end
         end
-        lib = lib.flatten.uniq
+        lib = lib.flatten.uniq.compact
         
         collection = Zfben_libjs::Collection.new(lib, @libs)
         collection.merge!
@@ -142,7 +142,7 @@ class Zfben_libjs::Libjs
 =end
       tip '== [2/2] Generate lib.js =='
       
-      libjs = File.read(@libs['lazyload']) << ';'
+      libjs = File.read(@libs['lazyload'][0]) << ';'
       
       libjs_core = File.read(File.join(@path_gem, 'lib.coffee'))
       

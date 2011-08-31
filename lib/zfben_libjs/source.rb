@@ -1,13 +1,12 @@
 module Zfben_libjs
 
   def self.get_source filepath, *options
-    type = File.extname(filepath).delete('.')
+    type = File.extname(filepath).delete('.').capitalize
 
-    class_name = type.capitalize
-    if Zfben_libjs.const_defined?(class_name, false)
-      source_class = Zfben_libjs.const_get(class_name)
+    if Zfben_libjs.const_defined?(type, false)
+      source_class = Zfben_libjs.const_get(type)
     else
-      raise Exception.new(class_name + ' isn\'t exists!')
+      raise Exception.new(type + ' isn\'t exists!')
     end
 
     return source_class.new :filepath => filepath, :options => options[0]
@@ -23,9 +22,7 @@ module Zfben_libjs
 
       @options = {} if @options.nil?
 
-      if remote?
-        download!
-      end
+      download! if remote?
 
       @source = @source || File.read(@filepath)
 
@@ -39,15 +36,11 @@ module Zfben_libjs
     def download!
       @remote_path = @filepath
       @filepath = File.join(@options['src/source'], '.download', File.basename(@remote_path))
-      FileUtils.mkdir(File.dirname(@filepath)) unless File.exists?(File.dirname(@filepath))
-      unless system 'wget ' + @remote_path + ' -O ' + @filepath
-        FileUtils.rm @filepath
-        raise Exception.new(@remote_path + ' download failed!')
-      end
+      download @remote_path, @filepath
     end
 
-    def name
-      self.class.to_s.downcase.gsub(/Zfben_libjs::/, '')
+    def type
+      self.class.to_s.gsub(/Zfben_libjs::/, '').downcase
     end
 
     def compile
@@ -60,6 +53,20 @@ module Zfben_libjs
       @minified = @minified || @compiled || @source
       @minified = @minified.gsub(/\n/ , '')
     end
+    
+    private
+    
+    def download url, path
+      if !File.exists?(path) || @options['download']
+        dir = File.dirname(path)
+        FileUtils.mkdir(dir) unless File.exists?(dir)
+        unless system 'wget ' + url + ' -O ' + path
+          FileUtils.rm path
+          raise Exception.new(url + ' download failed!')
+        end
+      end
+    end
+    
   end
 
 end
