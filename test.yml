@@ -16,6 +16,13 @@ libs:
   route_string: test/route_string.js
   
   route_regexp: test/route_regexp.js
+  
+  jquery: https://ajax.googleapis.com/ajax/libs/jquery/1/jquery.js
+
+  jqueryui:
+    - jquery
+    - https://ajax.googleapis.com/ajax/libs/jqueryui/1/jquery-ui.js
+    - https://raw.github.com/jquery/jquery-ui/master/themes/base/jquery.ui.all.css
 
 routes:
   "#Test_StringRoute": route_string

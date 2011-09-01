@@ -93,7 +93,7 @@ class Zfben_libjs::Libjs
       if opts.has_key?(name)
         case opts[name].class.to_s
           when 'Hash'
-            p opts[name]
+            opts[name]
             options[name] = options[name].merge(opts[name])
           when 'Array'
             options[name] = (options[name] + opts[name]).uniq

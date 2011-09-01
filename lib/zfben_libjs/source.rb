@@ -38,6 +38,14 @@ module Zfben_libjs
       @filepath = File.join(@options['src/source'], '.download', File.basename(@remote_path))
       download @remote_path, @filepath
     end
+    
+    def name
+      unless @filepath.nil?
+        File.basename(@filepath, File.extname(@filepath))
+      else
+        nil
+      end
+    end
 
     def type
       self.class.to_s.gsub(/Zfben_libjs::/, '').downcase

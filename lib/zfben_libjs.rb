@@ -59,28 +59,7 @@ class Zfben_libjs::Libjs
         end
         lib = lib.flatten.uniq.compact
         
-        collection = Zfben_libjs::Collection.new(lib, @libs)
-        collection.merge!
-        
-        lib = []
-        
-        if collection.css.length > 0
-          path = File.join(@opts[:config]['src/stylesheets'], name + '.css')
-          File.open(path, 'w'){ |f| f.write(collection.merge_css) }
-          lib.push path
-        end
-        
-        if collection.js.length > 0
-          path = File.join(@opts[:config]['src/javascripts'], name + '.js')
-          File.open(path, 'w'){ |f| f.write(collection.merge_js) }
-          lib.push path
-        end
-        
-        if collection.image.length > 0
-          lib.push collection.image
-        end
-        
-        @libs[name] = lib.flatten.compact.uniq
+        @libs[name] = Zfben_libjs::Collection.new(name, lib, @libs, @opts[:config]).write_files!
       end
 =begin
         @libs[name] = lib.map{ |file|
