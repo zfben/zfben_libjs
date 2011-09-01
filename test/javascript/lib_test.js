@@ -53,7 +53,9 @@ test('lib.libs', 6, function(){
     unload: [ '/javascripts/unload.js' ],
     load_times: [ '/javascripts/load_times.js' ],
     route_string: [ '/javascripts/route_string.js' ],
-    route_regexp: [ '/javascripts/route_regexp.js' ]
+    route_regexp: [ '/javascripts/route_regexp.js' ],
+    jquery: [ '/javascripts/jquery.js' ],
+    jqueryui: [ '/stylesheets/jqueryui.css', '/javascripts/jqueryui.js' ]
   }, 'lib.libs is ok');
   
   equal(typeof lib.lazyload, 'function', 'lib.lazyload is a function');
@@ -68,6 +70,8 @@ test('lib.libs', 6, function(){
     load_times: [ '/javascripts/load_times.js' ],
     route_string: [ '/javascripts/route_string.js' ],
     route_regexp: [ '/javascripts/route_regexp.js' ],
+    jquery: [ '/javascripts/jquery.js' ],
+    jqueryui: [ '/stylesheets/jqueryui.css', '/javascripts/jqueryui.js' ],
     test: 'test'
   }, "lib.libs({test: 'test'}) has been added");
   
@@ -82,7 +86,9 @@ test('lib.libs', 6, function(){
     unload: [ '/javascripts/unload.js' ],
     load_times: [ '/javascripts/load_times.js' ],
     route_string: [ '/javascripts/route_string.js' ],
-    route_regexp: [ '/javascripts/route_regexp.js' ]
+    route_regexp: [ '/javascripts/route_regexp.js' ],
+    jquery: [ '/javascripts/jquery.js' ],
+    jqueryui: [ '/stylesheets/jqueryui.css', '/javascripts/jqueryui.js' ]
   }, "lib.libs({test: null}) has been deleted");
   
   equal(typeof lib.test, 'undefined', 'lib.test is undefined');

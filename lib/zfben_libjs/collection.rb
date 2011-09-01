@@ -27,32 +27,21 @@ class Zfben_libjs::Collection
     
     merge_css = ''
     @css.each do |css|
-      merge_css << css.to_css + ';'
+      merge_css << css.to_css
     end
     if merge_css != ''
       @css_path = File.join(@options['src/stylesheets'], @name + '.css')
+      css = Zfben_libjs::Css.new(:source => merge_css, :options => @options)
       if @options['changeImageUrl']
-        merge_css = merge_css.partition_all(REGEXP_REMOTE_IMAGE).map{ |line|
-          if REGEXP_REMOTE_IMAGE =~ line
-            path = line.match(REGEXP_REMOTE_IMAGE)[1]
-            filename = File.basename(path)
-            if File.exists?(File.join(@options['src/images'], filename))
-              if @options['url'] == ''
-                url = '../images/' + filename
-              else
-                url = @options['url/images'] + '/' + filename
-              end
-              line = 'url("' << url << '")'
-            end
-          end
-          line
-        }
+        css.change_images_url!
       end
       if @options['minify']
         #File.open(@css_path + '.debug', 'w'){ |f| f.write(merge_css) }
-        merge_css = Zfben_libjs::Css.new(:source => merge_css).minify
+        file_content = css.minify
+      else
+        file_content = css.compile
       end
-      File.open(@css_path, 'w'){ |f| f.write(merge_css) }
+      File.open(@css_path, 'w'){ |f| f.write(file_content) }
     else
       @css_path = nil
     end

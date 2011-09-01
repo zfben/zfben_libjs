@@ -33,6 +33,24 @@ class Zfben_libjs::Css < Zfben_libjs::Source
     @minified = Sass::Engine.new(to_sass, @options).render
   end
   
+  def change_images_url!
+    @source = @source.partition_all(REGEXP_REMOTE_IMAGE).map{ |line|
+      if REGEXP_REMOTE_IMAGE =~ line
+        path = line.match(REGEXP_REMOTE_IMAGE)[1]
+        filename = File.basename(path)
+        if File.exists?(File.join(@options['src/images'], filename))
+          if @options['url'] == ''
+            url = '../images/' + filename
+          else
+            url = @options['url/images'] + '/' + filename
+          end
+          line = 'url("' << url << '")'
+        end
+      end
+      line
+    }.join ''
+  end
+  
   private
   
   def import_remote_css source, remote_url
