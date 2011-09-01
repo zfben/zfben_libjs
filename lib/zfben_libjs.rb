@@ -61,64 +61,7 @@ class Zfben_libjs::Libjs
         
         @libs[name] = Zfben_libjs::Collection.new(name, lib, @libs, @opts[:config]).write_files!
       end
-=begin
-        @libs[name] = lib.map{ |file|
-          if File.exists?(file)
-            case File.extname(file)
-              when '.js'
-                type = 'javascripts'
-              when '.css'
-                type = 'stylesheets'
-              else
-                type = 'images'
-            end
-            
-            path = File.join(@opts[:config]['src/' + type], File.basename(file))
-            
-            tip '=> ' + path
-            
-            system('cp ' + file + ' ' + path)
-            
-            reg = /url\("?'?([^'")]+)'?"?\)/
-            if type == 'stylesheets' && @opts[:config]['changeImageUrl'] && reg =~ File.read(path)
-              css = File.read(path).partition_all(reg).map{ |f|
-                if reg =~ f
-                  filename = File.basename(f.match(reg)[1])
-                  if File.exists?(File.join(@opts[:config]['src/images'], filename))
-                    if @opts[:config]['url'] == ''
-                      url = '../images/' << File.basename(f.match(reg)[1])
-                    else
-                      url = @opts[:config]['url/images'] + File.basename(f.match(reg)[1])
-                    end
-                    f = 'url("' << url << '")'
-                  end
-                end
-                f
-              }.join('')
-              File.open(path, 'w'){ |f| f.write(css) }
-            end
-            if type == 'images'
-              path = nil
-            end
-            
-            if @opts[:config]['minify']
-              if type == 'stylesheets'
-                min = minify(File.read(path), :css)
-                File.open(path, 'w'){ |f| f.write(min) }
-              end
-              if type == 'javascripts'
-                min = minify(File.read(path), :js)
-                File.open(path, 'w'){ |f| f.write(min) }
-              end
-            end
-          else
-            path = @libs[file]
-          end
-          path
-        }.compact.flatten.uniq
-        @libs[name] = @libs[name][0] if @libs[name].length == 1
-      end
-=end
+
       tip '== [2/2] Generate lib.js =='
       
       libjs = File.read(@libs['lazyload'][0]) << ';'

@@ -5,7 +5,7 @@ class Zfben_libjs::Js < Zfben_libjs::Source
   end
 
   def before_minify
-    Uglifier.compile(@source, :copyright => false)
+    @minified = Uglifier.compile(@source, :copyright => false)
   end
 
 end
