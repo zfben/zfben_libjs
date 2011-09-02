@@ -96,12 +96,13 @@ class Zfben_libjs::Libjs
             opts[name]
             options[name] = options[name].merge(opts[name])
           when 'Array'
+            opts[name] = [opts[name]] if opts[name].class.to_s != 'Array'
             options[name] = (options[name] + opts[name]).uniq
         end
       end
     end
     
-    options[:support_source].each{ |f| require f }
+    options[:support_source].each{ |f| require File.realpath(f) }
     
     return options
   end

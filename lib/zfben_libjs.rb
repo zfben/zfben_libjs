@@ -30,9 +30,10 @@ end
 
 class Zfben_libjs::Libjs
   def build!
-    tip '== Starting Build'
+    tip '== Starting Build =='
      
     if @opts[:config].has_key?('before')
+      tip '== Runing Before Scripts =='
       load @opts[:config]['before']
     end
     tip '== [1/2] Starting Progress Source =='
@@ -74,7 +75,6 @@ class Zfben_libjs::Libjs
       
       @urls = {}
      
-      p @libs
       @libs.each do |lib, path|
         path = [path] unless path.class == Array
         path = path.map{ |url|
