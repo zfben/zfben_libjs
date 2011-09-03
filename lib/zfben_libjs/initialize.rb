@@ -4,15 +4,8 @@ class Zfben_libjs::Libjs
     :config => {
       
       'src' => 'src',
-      'src/source' => 'src/.source',
-      'src/javascripts' => 'src/javascripts',
-      'src/images' => 'src/images',
-      'src/stylesheets' => 'src/stylesheets',
 
       'url' => '',
-      'url/javascripts' => '/javascripts',
-      'url/images' => '/images',
-      'url/stylesheets' => '/stylesheets',
       
       'download' => false,
       'minify' => true,
@@ -48,9 +41,15 @@ class Zfben_libjs::Libjs
     @path_gem = File.realpath(File.dirname(__FILE__))
     
     # config
-    ['src', 'src/source', 'src/javascripts', 'src/images', 'src/stylesheets'].each do |path|
-      FileUtils.mkdir(@opts[:config][path]) unless File.exists?(@opts[:config][path])
+    FileUtils.mkdir(@opts[:config]['src']) unless File.exists?(@opts[:config]['src'])
+    ['source', 'javascripts', 'images', 'stylesheets'].each do |path|
+      key = 'src/' + path
+      @opts[:config][key] = File.join(@opts[:config]['src'], path) unless @opts[:config].has_key?(key)
+      FileUtils.mkdir(@opts[:config][key]) unless File.exists?(@opts[:config][key])
+      @opts[:config]['url/' + path] = @opts[:config]['url'] + '/' + path unless @opts[:config].has_key?('url/' + path)
     end
+
+    p @opts
 
     # Merge default libs
     @libs = {
