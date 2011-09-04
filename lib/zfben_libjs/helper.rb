@@ -1,4 +1,4 @@
-module Zfben_libjs::Helper
+module Zfben_libjs::Helpers
   Lib_version = Time.now.strftime('?%s')
   def lib *opts
     html = ''
