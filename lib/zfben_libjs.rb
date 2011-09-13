@@ -17,7 +17,7 @@ module Zfben_libjs
   end
 end
 
-['lib.rb', 'source.rb', 'initialize.rb', 'collection.rb', 'helpers.rb', 'railtie.rb', 'sinatra.rb'].each { |f| require File.join(File.dirname(__FILE__), 'zfben_libjs', f) }
+['lib.rb', 'source.rb', 'initialize.rb', 'collection.rb', 'helpers.rb', 'railtie.rb'].each { |f| require File.join(File.dirname(__FILE__), 'zfben_libjs', f) }
   
 def err msg
   STDERR.print "#{msg}\n".color(:red)
