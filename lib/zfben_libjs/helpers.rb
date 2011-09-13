@@ -24,6 +24,8 @@ module Zfben_libjs::Helpers
       end
       if lib_preload.length > 0
         html << lib_js('lib.js') << "<script>lib('#{lib_preload.join(' ')}')</script>"
+      else
+        html << '<script>lib()</script>'
       end
     end
     return html

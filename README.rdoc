@@ -81,3 +81,7 @@ support before and after events
 
   <%= lib 'home.js' %>
   # => <script src="/javascripts/home.js?12345678"></script><script src="/javascripts/lib.js?12345678"></script>
+
+== Sinatra
+
+  helpers Zfben_libjs::Helpers

@@ -17,7 +17,7 @@ module Zfben_libjs
   end
 end
 
-['lib.rb', 'source.rb', 'initialize.rb', 'collection.rb', 'helper.rb', 'railtie.rb', 'sinatra.rb'].each { |f| require File.join(File.dirname(__FILE__), 'zfben_libjs', f) }
+['lib.rb', 'source.rb', 'initialize.rb', 'collection.rb', 'helpers.rb', 'railtie.rb', 'sinatra.rb'].each { |f| require File.join(File.dirname(__FILE__), 'zfben_libjs', f) }
   
 def err msg
   STDERR.print "#{msg}\n".color(:red)
@@ -65,13 +65,13 @@ class Zfben_libjs::Libjs
 
       tip '== [2/2] Generate lib.js =='
       
-      libjs = File.read(@libs['lazyload'][0]) << ';'
+      libjs = File.read(@libs['lazyload'][0]) << ";\n"
       
       libjs_core = File.read(File.join(@path_gem, 'lib.coffee'))
       
       libjs_core = CoffeeScript.compile(libjs_core)
 
-      libjs << libjs_core << ';'
+      libjs << libjs_core << ";\n"
       
       @urls = {}
      
@@ -91,8 +91,8 @@ class Zfben_libjs::Libjs
         @urls[lib] = path
       end
       
-      libjs << "\n/* libs */\nlib.libs(#{@urls.to_json});lib.loaded('add', 'lazyload');"
-      libjs << Time.now.strftime('lib.defaults.version = "?%s";')
+      libjs << "\n/* libs */\nlib.libs(#{@urls.to_json});lib.loaded('add', 'lazyload');\n"
+      libjs << Time.now.strftime("lib.defaults.version = '?%s';\n")
       
       if @opts.has_key?(:bundle)
         bundle = {}
@@ -109,7 +109,7 @@ class Zfben_libjs::Libjs
                 when '.css'
                   css << File.read(file)
                 when '.js'
-                  js << File.read(file) << ';'
+                  js << File.read(file) << ";\n"
               end
             end
           end
@@ -136,7 +136,7 @@ class Zfben_libjs::Libjs
           end
         end
         
-        libjs << "\n/* bundle */\nlib.libs(#{bundle.to_json});"
+        libjs << "\n/* bundle */\nlib.libs(#{bundle.to_json});\n"
       end
       
       if @opts.has_key?(:routes)
@@ -145,12 +145,12 @@ class Zfben_libjs::Libjs
           lib_name = lib_name.join ' ' if lib_name.class == Array
           routes[path] = lib_name
         end
-        libjs << "\n/* routes */\nlib.routes('add', #{routes.to_json});"
+        libjs << "\n/* routes */\nlib.routes('add', #{routes.to_json});\n"
       end
       
       if @opts.has_key?(:preload)
         preload = @opts[:preload].class == Array ? @opts[:preload] : [ @opts[:preload] ]
-        libjs << "\n/* preload */\nlib('#{preload.join(' ')}');"
+        libjs << "\n/* preload */\nlib('#{preload.join(' ')}');\n"
       end
       
       libjs = minify(libjs, :js) if @opts[:config]['minify']

@@ -48,7 +48,7 @@ class Zfben_libjs::Collection
     
     merge_js = ''
     @js.each do |js|
-      merge_js << js.to_js + ';'
+      merge_js << js.to_js + ";\n"
     end
     if merge_js != ''
       @js_path = File.join(@options['src/javascripts'], @name + '.js')
