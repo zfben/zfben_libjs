@@ -4,13 +4,20 @@ libs = {}
 # save loaded source to `loaded`
 loaded = {}
 
+progress_loaded_url = (url)->
+  url = url.match(/[^?]+/)[0]
+  local = location.protocol + '//' + location.host
+  if url.indexOf(local) is 0
+    url = url.substring(local.length)
+  return url
+
 for link in document.getElementsByTagName('link')
   if link.href && link.href isnt ''
-    loaded[link.href] = true
+    loaded[progress_loaded_url(link.href)] = true
 
 for script in document.getElementsByTagName('script')
   if script.src && script.src isnt ''
-    loaded[script.src] = true
+    loaded[progress_loaded_url(script.src)] = true
 
 # pending
 pending_urls = {}
