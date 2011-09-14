@@ -52,11 +52,13 @@ module Zfben_libjs
     end
 
     def compile
+      print "compile #{@filepath}\n" unless @filepath.nil?
       before_compile if self.respond_to?(:before_compile)
       @compiled = @compiled || @source
     end
 
     def minify
+      print "minify #{@filepath}\n" unless @filepath.nil?
       before_minify if self.respond_to?(:before_minify)
       @minified = @minified || @compiled || @source
       @minified = @minified.gsub(/\n/ , '')
