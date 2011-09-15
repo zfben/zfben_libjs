@@ -177,29 +177,36 @@ lib.defaults = {}
 routes = {}
 last_location = ''
 
-path2regex = (path)->
+path2regexp = (path)->
+  if typeof path['test'] is 'function'
+    return path
   if path[0] is '/' && path[path.length - 1] is '/'
     path = path[1..(path.length - 2)]
-  return path
+  return RegExp(path)
 
 lib.routes = (method, args)->
   switch method
     when 'add'
       for path, lib_name of args
-        routes[path2regex(path)] = lib_name
+        routes[path2regexp(path).toString()] = lib_name
       last_location = ''
     when 'del'
       for path, lib_name of args
-        delete(routes[path2regex(path)])
+        delete(routes[path2regexp(path).toString()])
   return routes
 
 Location_watch = ->
   location_path = location.hostname + location.pathname + location.hash
   if location_path isnt last_location
     libs_name = []
-    for path, lib_name of routes
-      if RegExp(path).test location_path
-        libs_name.push lib_name
+    for regexp, lib_name of routes
+      test = location_path.match(path2regexp(regexp))
+      if test isnt null
+        if typeof libs_name is 'string'
+          libs_name.push lib_name
+        else
+          if typeof lib_name is 'function'
+            lib_name test
     if libs_name.length > 0
       lib(libs_name.join(' '))
     last_location = location_path

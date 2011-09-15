@@ -1,7 +1,7 @@
 module Zfben_libjs::Helpers
   Lib_version = Time.now.strftime('?%s')
   def lib *opts
-    html = lib_js 'lib.js'
+    html = ''
     unless opts.blank?
       preload = []
       lib_preload = []
@@ -23,6 +23,8 @@ module Zfben_libjs::Helpers
           end
         end
       end
+
+      html << lib_js('lib.js')
 
       if lib_preload.length > 0
         html << "<script>lib('#{lib_preload.join(' ')}')</script>"
