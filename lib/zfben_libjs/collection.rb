@@ -1,5 +1,5 @@
 class Zfben_libjs::Collection
-  attr_accessor :name, :sources, :options, :css, :js, :images, :css_path, :js_path, :images_path
+  attr_accessor :name, :sources, :options, :libs, :css, :js, :images, :css_path, :js_path, :images_path
   
   def initialize name, sources, libs, options
     sources = [sources] unless sources.class.to_s != 'Array'
@@ -9,6 +9,7 @@ class Zfben_libjs::Collection
     
     @options = options
     
+    @libs = []
     @css = []
     @js = []
     @images = []
@@ -60,8 +61,12 @@ class Zfben_libjs::Collection
     else
       @js_path = nil
     end
+
+    if @libs.length > 0
+      @libs = @libs.flatten.uniq
+    end
     
-    return [@css_path, @js_path].compact
+    return @libs + [@css_path, @js_path].compact
   end
   
   private
@@ -69,7 +74,7 @@ class Zfben_libjs::Collection
   def process_sources sources, libs
     sources.each do |source|
       if libs.has_key?(source)
-        process_sources libs[source], libs
+        @libs.push(libs[source])
       elsif source.respond_to?(:to_css)
         @css.push source
         @images = @images + source.images if source.respond_to?(:images)

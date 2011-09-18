@@ -16,8 +16,8 @@ test('lib.loaded', 3, function(){
     'http://code.jquery.com/jquery.min.js': true,
     'http://code.jquery.com/qunit/qunit-git.css': true,
     'http://code.jquery.com/qunit/qunit-git.js': true,
-    'http://localhost:4711/callback.js': true,
-    'http://localhost:4711/javascripts/lib.js': true,
+    '/callback.js': true,
+    '/javascripts/lib.js': true,
     '/javascripts/lazyload.js': true
   }, 'lib.loaded files are ok');
   
@@ -25,8 +25,8 @@ test('lib.loaded', 3, function(){
     'http://code.jquery.com/jquery.min.js': true,
     'http://code.jquery.com/qunit/qunit-git.css': true,
     'http://code.jquery.com/qunit/qunit-git.js': true,
-    'http://localhost:4711/callback.js': true,
-    'http://localhost:4711/javascripts/lib.js': true,
+    '/callback.js': true,
+    '/javascripts/lib.js': true,
     '/javascripts/lazyload.js': true,
     'test': true
   }, "lib.loaded('add', 'test') has been added");
@@ -35,8 +35,8 @@ test('lib.loaded', 3, function(){
     'http://code.jquery.com/jquery.min.js': true,
     'http://code.jquery.com/qunit/qunit-git.css': true,
     'http://code.jquery.com/qunit/qunit-git.js': true,
-    'http://localhost:4711/callback.js': true,
-    'http://localhost:4711/javascripts/lib.js': true,
+    '/callback.js': true,
+    '/javascripts/lib.js': true,
     '/javascripts/lazyload.js': true
   }, "lib.loaded('del', 'test') has been deleted");
 
@@ -55,7 +55,7 @@ test('lib.libs', 6, function(){
     route_string: [ '/javascripts/route_string.js' ],
     route_regexp: [ '/javascripts/route_regexp.js' ],
     jquery: [ '/javascripts/jquery.js' ],
-    jqueryui: [ '/stylesheets/jqueryui.css', '/javascripts/jqueryui.js' ]
+    jqueryui: [ '/javascripts/jquery.js', '/stylesheets/jqueryui.css', '/javascripts/jqueryui.js' ]
   }, 'lib.libs is ok');
   
   equal(typeof lib.lazyload, 'function', 'lib.lazyload is a function');
@@ -71,7 +71,7 @@ test('lib.libs', 6, function(){
     route_string: [ '/javascripts/route_string.js' ],
     route_regexp: [ '/javascripts/route_regexp.js' ],
     jquery: [ '/javascripts/jquery.js' ],
-    jqueryui: [ '/stylesheets/jqueryui.css', '/javascripts/jqueryui.js' ],
+    jqueryui: [ '/javascripts/jquery.js', '/stylesheets/jqueryui.css', '/javascripts/jqueryui.js' ],
     test: 'test'
   }, "lib.libs({test: 'test'}) has been added");
   
@@ -88,7 +88,7 @@ test('lib.libs', 6, function(){
     route_string: [ '/javascripts/route_string.js' ],
     route_regexp: [ '/javascripts/route_regexp.js' ],
     jquery: [ '/javascripts/jquery.js' ],
-    jqueryui: [ '/stylesheets/jqueryui.css', '/javascripts/jqueryui.js' ]
+    jqueryui: [ '/javascripts/jquery.js', '/stylesheets/jqueryui.css', '/javascripts/jqueryui.js' ]
   }, "lib.libs({test: null}) has been deleted");
   
   equal(typeof lib.test, 'undefined', 'lib.test is undefined');

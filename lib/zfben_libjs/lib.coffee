@@ -202,7 +202,7 @@ Location_watch = ->
     for regexp, lib_name of routes
       test = location_path.match(path2regexp(regexp))
       if test isnt null
-        if typeof libs_name is 'string'
+        if typeof lib_name is 'string'
           libs_name.push lib_name
         else
           if typeof lib_name is 'function'
