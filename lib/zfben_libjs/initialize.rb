@@ -24,19 +24,22 @@ class Zfben_libjs::Libjs
   
   Default_options[:support_source] = Dir[File.join(File.dirname(__FILE__), 'support_source', '*.rb')]
 
-  def initialize *opts
-    
+  def initialize *options
     # recive path or hash options
-    case opts[0].class.to_s
+    case options[0].class.to_s
       when 'String'
-        opts = read_config_file(opts[0])
+        opts = read_config_file(options[0])
       when 'Hash'
-        opts = opts[0]
+        opts = options[0]
       else
-        opts = {}
+        opts = Default_options.clone
     end
     
     @opts = merge_and_convert_options(opts)
+
+    if options[1].class.to_s == 'Hash'
+      @opts = @opts.deep_merge(options[1])
+    end
     
     @path_gem = File.realpath(File.dirname(__FILE__))
     
@@ -48,8 +51,6 @@ class Zfben_libjs::Libjs
       FileUtils.mkdir(@opts[:config][key]) unless File.exists?(@opts[:config][key])
       @opts[:config]['url/' + path] = @opts[:config]['url'] + '/' + path unless @opts[:config].has_key?('url/' + path)
     end
-
-    p @opts
 
     # Merge default libs
     @libs = {
@@ -71,7 +72,7 @@ class Zfben_libjs::Libjs
   def read_config_file filepath
     config_file = File.exists?(filepath) && !File.directory?(filepath) ? [filepath] : Dir[filepath + '*'].select{ |f| !File.directory?(f) }
     if config_file.length == 0
-      err config_file + ' is not exist!'
+      err filepath + ' is not exist!'
     end
     
     begin

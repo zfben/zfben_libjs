@@ -1,6 +1,6 @@
 class Zfben_libjs::Css < Zfben_libjs::Source
 
-  REGEXP_REMOTE_CSS = /@import[^"]+"([^"]+)"/
+  REGEXP_REMOTE_CSS = /@import[^"]+"([^"]+)"\)?;?/
   REGEXP_REMOTE_IMAGE = /url\("?'?([^'")]+)'?"?\)/
   
   def after_initialize

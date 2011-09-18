@@ -1,6 +1,6 @@
 class Zfben_libjs::Sass < Zfben_libjs::Source
   def after_initialize
-    @options = @options.merges({ :syntax => :sass, :cache => false }, Compass.sass_engine_options)
+    @options = @options.merges({ :syntax => :sass }, Compass.sass_engine_options)
     @options[:load_paths].push File.dirname(@filepath)
     @source = "@import compass\n" + @source
   end
