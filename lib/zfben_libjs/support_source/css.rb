@@ -6,10 +6,12 @@ class Zfben_libjs::Css < Zfben_libjs::Source
   def after_initialize
     @options = @options.merge({ :syntax => :sass, :style => :compressed, :cache => false })
     
+    @images = []
+
     if @remote_path || @filepath
       remote_url = File.dirname(@remote_path || @filepath)
       @source = import_remote_css @source, remote_url
-      @images = download_images! remote_url
+      download_images! remote_url
     end
   end
   
@@ -71,7 +73,7 @@ class Zfben_libjs::Css < Zfben_libjs::Source
   end
   
   def download_images! remote_url
-    @source.partition_all(REGEXP_REMOTE_IMAGE).map{ |line|
+    @source = @source.partition_all(REGEXP_REMOTE_IMAGE).map{ |line|
       if REGEXP_REMOTE_IMAGE =~ line
         url = REGEXP_REMOTE_IMAGE.match(line)[1]
         path = File.join(@options['src/source'], '.download', self.name + '_' + File.basename(url))
@@ -81,10 +83,10 @@ class Zfben_libjs::Css < Zfben_libjs::Source
         else
           path = url
         end
-        path
-      else
-        nil
+        @images.push path
+        line = 'url(../' + File.basename(path) + ')'
       end
-    }.compact.uniq
+      line
+    }.join("\n")
   end
 end
