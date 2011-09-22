@@ -3,7 +3,7 @@ $:.push File.expand_path("../lib", __FILE__)
 
 Gem::Specification.new do |s|
   s.name        = 'zfben_libjs'
-  s.version     = '0.0.25'
+  s.version     = '0.0.26'
   s.authors     = ["Ben"]
   s.email       = ["ben@zfben.com"]
   s.homepage    = "https://github.com/benz303/zfben_libjs"
@@ -32,5 +32,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'coffee-script'
   s.add_dependency 'uglifier'
   s.add_dependency 'activesupport'
+
+  s.add_development_dependency 'zfben_hanoi'
   
 end

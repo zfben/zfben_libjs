@@ -11,7 +11,7 @@ class Zfben_libjs::Css < Zfben_libjs::Source
     if @remote_path || @filepath
       remote_url = File.dirname(@remote_path || @filepath)
       @source = import_remote_css @source, remote_url
-      download_images! remote_url
+      @source = download_images! remote_url
     end
   end
   
@@ -40,17 +40,14 @@ class Zfben_libjs::Css < Zfben_libjs::Source
       if REGEXP_REMOTE_IMAGE =~ line
         path = line.match(REGEXP_REMOTE_IMAGE)[1]
         filename = File.basename(path)
-        if File.exists?(File.join(@options['src/images'], filename))
-          if @options['url'] == ''
-            url = '../images/' + filename
-          else
-            url = @options['url/images'] + '/' + filename
-          end
+        path = File.join(@options['src/images'], filename)
+        if File.exists?(path)
+          url = @options['url/images'] + '/' + filename
           line = 'url("' << url << '")'
         end
       end
       line
-    }.join ''
+    }.join "\n"
   end
   
   private
@@ -73,20 +70,18 @@ class Zfben_libjs::Css < Zfben_libjs::Source
   end
   
   def download_images! remote_url
-    @source = @source.partition_all(REGEXP_REMOTE_IMAGE).map{ |line|
-      if REGEXP_REMOTE_IMAGE =~ line
-        url = REGEXP_REMOTE_IMAGE.match(line)[1]
-        path = File.join(@options['src/source'], '.download', self.name + '_' + File.basename(url))
-        unless File.exists?(url) && File.exists?(path)
-          url = File.join(remote_url, url)
-          download(url, path)
-        else
-          path = url
-        end
-        @images.push path
-        line = 'url(../' + File.basename(path) + ')'
+    @source = @source.gsub(REGEXP_REMOTE_IMAGE){ |line|
+      url = REGEXP_REMOTE_IMAGE.match(line)[1]
+      path = File.join(@options['src/source'], '.download', self.name + '_' + File.basename(url))
+      unless File.exists?(path)
+        url = File.join(remote_url, url)
+        download(url, path)
+      end
+      if File.exists?(path)
+        line = "url('#{path}')"
+        @images.push File.realpath(path)
       end
       line
-    }.join("\n")
+    }
   end
 end
