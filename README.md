@@ -4,46 +4,44 @@ Lib.js = Frontend build tool + lazyload js tool
 
 ## Getting Started
 
- 1. Install zfben_libjs
-
+```bash
   gem install zfben_libjs
-
- 2. Create new libjs project
-
-  libjs new
+  
+  libjs new < project_name >
+```
 
 ## Feature:
 
-lazyload css and js files (base on LazyLoad.js)
+* lazyload css and js files (base on LazyLoad.js)
 
-support css, js and images files
+* support css, js and images files
 
-support sass, scss, compass and coffeescript files
+* support sass, scss, compass and coffeescript files
 
-support local files and remote files
+* support local files and remote files
 
-support custom ruby script
+* support custom ruby script
 
-support minify css and js files (base on sass and uglifier)
+* support minify css and js files (base on sass and uglifier)
 
-support before and after events
+* support before and after events
 
 ## Support Filetype:
 
-.css    -   stylesheet
+* .css    -   stylesheet
 
-.js     -   javascript
+* .js     -   javascript
 
-.sass   -   sass
+* .sass   -   sass
 
-.scss   -   scss
+* .scss   -   scss
 
-.coffee -   coffeescript
+* .coffee -   coffeescript
 
-.rb     -   ruby
+* .rb     -   ruby
 
 ## Javascript Example
-
+```javascript
   // load jquery
   lib.jquery(function(){
     // something use jquery to do
@@ -62,12 +60,13 @@ support before and after events
   lib('jquery underscore', function(){
     // use jquery and underscore to do sth.
   });
-
+```
 ## Rails Example
-
+```ruby
   # Gemfile
   gem 'zfben_libjs'
-
+```
+```erb
   # layout.html.erb
 
   <%= lib %>
@@ -81,9 +80,8 @@ support before and after events
 
   <%= lib 'home.js' %>
   # => <script src="/javascripts/home.js?12345678"></script><script src="/javascripts/lib.js?12345678"></script>
-
+```
 ## Sinatra
-
+```ruby
   helpers Zfben_libjs::Helpers
-
-## TODO
+```
