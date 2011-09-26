@@ -55,7 +55,9 @@ test('lib.libs', 6, function(){
     route_string: [ '/javascripts/route_string.js' ],
     route_regexp: [ '/javascripts/route_regexp.js' ],
     jquery: [ '/javascripts/jquery.js' ],
-    jqueryui: [ '/javascripts/jquery.js', '/stylesheets/jqueryui.css', '/javascripts/jqueryui.js' ]
+    jqueryui: [ '/javascripts/jquery.js', '/stylesheets/jqueryui.css', '/javascripts/jqueryui.js' ],
+    mustache: [ '/javascripts/mustache.js' ],
+    custom_filetype: [ '/javascripts/mustache.js', '/javascripts/custom_filetype.js' ]
   }, 'lib.libs is ok');
   
   equal(typeof lib.lazyload, 'function', 'lib.lazyload is a function');
@@ -72,6 +74,8 @@ test('lib.libs', 6, function(){
     route_regexp: [ '/javascripts/route_regexp.js' ],
     jquery: [ '/javascripts/jquery.js' ],
     jqueryui: [ '/javascripts/jquery.js', '/stylesheets/jqueryui.css', '/javascripts/jqueryui.js' ],
+    mustache: [ '/javascripts/mustache.js' ],
+    custom_filetype: [ '/javascripts/mustache.js', '/javascripts/custom_filetype.js' ],
     test: 'test'
   }, "lib.libs({test: 'test'}) has been added");
   
@@ -88,7 +92,9 @@ test('lib.libs', 6, function(){
     route_string: [ '/javascripts/route_string.js' ],
     route_regexp: [ '/javascripts/route_regexp.js' ],
     jquery: [ '/javascripts/jquery.js' ],
-    jqueryui: [ '/javascripts/jquery.js', '/stylesheets/jqueryui.css', '/javascripts/jqueryui.js' ]
+    jqueryui: [ '/javascripts/jquery.js', '/stylesheets/jqueryui.css', '/javascripts/jqueryui.js' ],
+    mustache: [ '/javascripts/mustache.js' ],
+    custom_filetype: [ '/javascripts/mustache.js', '/javascripts/custom_filetype.js' ]
   }, "lib.libs({test: null}) has been deleted");
   
   equal(typeof lib.test, 'undefined', 'lib.test is undefined');
@@ -156,4 +162,13 @@ asyncTest('RegExp route', 1, function(){
     ok(route_regexp, 'RegExp route is applied');
     start();
   }, 1000);
+});
+
+module('Custom Filetype');
+
+asyncTest('mustache', 1, function(){
+  lib('custom_filetype', function(){
+    equal(custom_filetype({title: 'Hello'}), '<h1>Hello</h1>', 'Mustache is ok');
+    start();
+  });
 });
