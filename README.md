@@ -4,46 +4,41 @@ Lib.js = Frontend build tool + lazyload js tool
 
 ## Getting Started
 
- 1. Install zfben_libjs
-
+```bash
   gem install zfben_libjs
-
- 2. Create new libjs project
-
-  libjs new
+  
+  libjs new < project_name >
+```
 
 ## Feature:
 
-lazyload css and js files (base on LazyLoad.js)
-
-support css, js and images files
-
-support sass, scss, compass and coffeescript files
-
-support local files and remote files
-
-support custom ruby script
-
-support minify css and js files (base on sass and uglifier)
-
-support before and after events
+* lazyload css and js files (base on LazyLoad.js)
+* minify css and js files (base on sass and uglifier)
+* support sass, scss, compass and coffeescript files
+* download remote files
+* custom ruby script
+* custom filetype
+* before and after events
+* custom routes
 
 ## Support Filetype:
 
-.css    -   stylesheet
+* .css    -   stylesheet
 
-.js     -   javascript
+* .js     -   javascript
 
-.sass   -   sass
+* .sass   -   sass
 
-.scss   -   scss
+* .scss   -   scss
 
-.coffee -   coffeescript
+* .coffee -   coffeescript
 
-.rb     -   ruby
+* .rb     -   ruby
+
+* .???    -   custom filetype
 
 ## Javascript Example
-
+```javascript
   // load jquery
   lib.jquery(function(){
     // something use jquery to do
@@ -62,12 +57,13 @@ support before and after events
   lib('jquery underscore', function(){
     // use jquery and underscore to do sth.
   });
-
+```
 ## Rails Example
-
+```ruby
   # Gemfile
   gem 'zfben_libjs'
-
+```
+```erb
   # layout.html.erb
 
   <%= lib %>
@@ -81,9 +77,47 @@ support before and after events
 
   <%= lib 'home.js' %>
   # => <script src="/javascripts/home.js?12345678"></script><script src="/javascripts/lib.js?12345678"></script>
-
-## Sinatra
-
+```
+## Sinatra Example
+```ruby
   helpers Zfben_libjs::Helpers
+```
 
-## TODO
+## Custom Filetype Example
+```yaml
+# add support_source to config yaml file
+support_source:
+  - mustache.rb
+```
+```ruby
+# mustache.rb
+class Zfben_libjs::Mustache < Zfben_libjs::Source
+  def after_initialize
+    @source = "this['#{File.basename(@filepath, '.mustache')}']=(data)->Mustache.to_html('''#{@source}''', data)"
+  end
+  
+  def compile
+    Zfben_libjs::Coffee.new(:source => @source).compile
+  end
+  
+  def to_js
+    compile
+  end
+  
+  def minify
+    @minified = Zfben_libjs::Js.new(:source => @source).minify
+  end
+end
+```
+
+## Routes
+```yaml
+# add routes to config yaml file
+routes:
+  "#Test_StringRoute": route_string
+  "/#Test_RegExpRoute/": route_regexp
+```
+
+## More Settings
+
+See https://github.com/benz303/zfben_libjs/blob/master/test.yml
