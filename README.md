@@ -13,18 +13,12 @@ Lib.js = Frontend build tool + lazyload js tool
 ## Feature:
 
 * lazyload css and js files (base on LazyLoad.js)
-
-* support css, js and images files
-
+* minify css and js files (base on sass and uglifier)
 * support sass, scss, compass and coffeescript files
-
-* support local files and remote files
-
-* support custom ruby script
-
-* support minify css and js files (base on sass and uglifier)
-
-* support before and after events
+* download remote files
+* custom ruby script
+* custom filetype
+* before and after events
 
 ## Support Filetype:
 
@@ -39,6 +33,38 @@ Lib.js = Frontend build tool + lazyload js tool
 * .coffee -   coffeescript
 
 * .rb     -   ruby
+
+* .???    -   custom filetype
+
+### Custom Filetype
+
+Custom Filetype can make something amazing! Let's see how to create .mustache filetype.
+
+```yaml
+# add support_source to config yaml file
+support_source:
+  - mustache.rb
+```
+```ruby
+# mustache.rb
+class Zfben_libjs::Mustache < Zfben_libjs::Source
+  def after_initialize
+    @source = "this['#{File.basename(@filepath, '.mustache')}']=(data)->Mustache.to_html('''#{@source}''', data)"
+  end
+  
+  def compile
+    Zfben_libjs::Coffee.new(:source => @source).compile
+  end
+  
+  def to_js
+    compile
+  end
+  
+  def minify
+    @minified = Zfben_libjs::Js.new(:source => @source).minify
+  end
+end
+```
 
 ## Javascript Example
 ```javascript
