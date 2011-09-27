@@ -124,8 +124,9 @@ See https://github.com/benz303/zfben_libjs/blob/master/test.yml
 
 ## TODO
 
-### Lib.js
+### libjs
 * Make lib() return as defferred object
+* Add ready event
 
 ### Ruby
 * Support Zfben_libjs::Libjs.new.build!(url)
