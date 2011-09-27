@@ -121,3 +121,13 @@ routes:
 ## More Settings
 
 See https://github.com/benz303/zfben_libjs/blob/master/test.yml
+
+## TODO
+
+### Lib.js
+* Make lib() return as defferred object
+
+### Ruby
+* Support Zfben_libjs::Libjs.new.build!(url)
+* Support auto-compile when file changed
+* Auto merge sass, scss and coffeescript to speed up compile
