@@ -128,7 +128,11 @@ See https://github.com/benz303/zfben_libjs/blob/master/test.yml
 * Make lib() return as defferred object
 * Add ready event
 
-### Ruby
+### Compile
 * Support Zfben_libjs::Libjs.new.build!(url)
 * Support auto-compile when file changed
 * Auto merge sass, scss and coffeescript to speed up compile
+* Lazyload files to speed up load
+
+### Web Service
+* Use sinatra as web server
