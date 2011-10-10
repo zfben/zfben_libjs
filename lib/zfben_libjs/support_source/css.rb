@@ -36,13 +36,14 @@ class Zfben_libjs::Css < Zfben_libjs::Source
   end
   
   def change_images_url!
+    version = Time.now.strftime('?%s')
     @source = @source.partition_all(REGEXP_REMOTE_IMAGE).map{ |line|
       if REGEXP_REMOTE_IMAGE =~ line
         path = line.match(REGEXP_REMOTE_IMAGE)[1]
         filename = File.basename(path)
         path = File.join(@options['src/images'], filename)
         if File.exists?(path)
-          url = @options['url/images'] + '/' + filename
+          url = @options['url/images'] + '/' + filename + version
           line = 'url("' << url << '")'
         end
       end
