@@ -131,8 +131,10 @@ See https://github.com/benz303/zfben_libjs/blob/master/test.yml
 ### Compile
 * Support Zfben_libjs::Libjs.new.build!(url)
 * Support auto-compile when file changed
-* Auto merge sass, scss and coffeescript to speed up compile
+* Auto merge sass and scss to speed up compile
 * Lazyload files to speed up load
+* Add debug mode for javascript
+* * use console.log(filepath)
 
 ### Web Service
 * Use sinatra as web server
