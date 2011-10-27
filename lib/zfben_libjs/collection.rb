@@ -28,7 +28,6 @@ class Zfben_libjs::Collection
     
     merge_css = ''
     @css.each do |css|
-      p css.class.to_s
       merge_css << css.to_css
     end
     if merge_css != ''

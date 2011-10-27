@@ -1,6 +1,5 @@
 require 'rubygems'
 require 'bundler/gem_tasks'
-
 require 'zfben_hanoi'
 
 namespace :test do
