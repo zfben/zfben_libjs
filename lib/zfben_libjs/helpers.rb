@@ -43,7 +43,7 @@ module Zfben_libjs::Helpers
 
   def asset_host
     if defined? Rails
-      if Rails.configuration.action_controller.has_key? :asset_host && !Rails.configuration.action_controller[:asset_host].nil?
+      if Rails.configuration.action_controller.has_key?(:asset_host) && !Rails.configuration.action_controller[:asset_host].nil?
         return Rails.configuration.action_controller[:asset_host] + (request.port == 80 ? '' : (':' << request.port.to_s))
       end
     end
